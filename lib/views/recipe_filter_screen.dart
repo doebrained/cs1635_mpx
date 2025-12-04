@@ -1,48 +1,60 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:flutter_card_swiper/flutter_card_swiper.dart';
 
 import '../viewmodels/recipe_filter_viewmodel.dart';
 import '../models/recipe.dart';
 import 'widgets/recipe_card.dart';
 
-class RecipeFilterScreen extends StatelessWidget {
+class RecipeFilterScreen extends StatefulWidget {
   const RecipeFilterScreen({super.key});
 
   @override
+  State<RecipeFilterScreen> createState() => _RecipeFilterScreenState();
+}
+
+class _RecipeFilterScreenState extends State<RecipeFilterScreen> {
+  @override
+  void initState() {
+    super.initState();
+    // Load recipes from Spoonacular once when the screen is created
+    Future.microtask(() {
+      context.read<RecipeFilterViewModel>().loadRecipes();
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final viewModel = context.watch<RecipeFilterViewModel>();
-    final filtered = viewModel.filteredRecipes;
+    final vm = context.watch<RecipeFilterViewModel>();
+    final filtered = vm.filteredRecipes;
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Swipe Recipes – Demo'),
+        title: const Text('Swipe Recipes 🍽️'),
       ),
       body: Padding(
-        padding: const EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const Text(
               'Dietary Filters',
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-              ),
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 8),
 
-            // VERTICAL filters
+            // Filters stacked vertically
             Column(
               children: [
                 SwitchListTile(
                   title: const Text('Celiac-safe only (gluten-free)'),
-                  value: viewModel.celiacOnly,
-                  onChanged: viewModel.toggleCeliacOnly,
+                  value: vm.celiacOnly,
+                  onChanged: vm.toggleCeliacOnly,
                 ),
                 SwitchListTile(
                   title: const Text('Lactose-free only'),
-                  value: viewModel.lactoseOnly,
-                  onChanged: viewModel.toggleLactoseOnly,
+                  value: vm.lactoseOnly,
+                  onChanged: vm.toggleLactoseOnly,
                 ),
               ],
             ),
@@ -50,14 +62,43 @@ class RecipeFilterScreen extends StatelessWidget {
             const SizedBox(height: 8),
             Text(
               'Matching recipes: ${filtered.length}',
-              style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
+              style: const TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.w500,
+              ),
             ),
-            const SizedBox(height: 8),
             const Divider(),
             const SizedBox(height: 8),
 
-            const Expanded(
-              child: _SwipeDeck(),
+            Expanded(
+              child: Builder(
+                builder: (context) {
+                  if (vm.isLoading) {
+                    return const Center(child: CircularProgressIndicator());
+                  }
+
+                  if (vm.errorMessage != null) {
+                    return Center(
+                      child: Text(
+                        "⚠️ Error: ${vm.errorMessage}",
+                        textAlign: TextAlign.center,
+                      ),
+                    );
+                  }
+
+                  if (filtered.isEmpty) {
+                    return const Center(
+                      child: Text(
+                        'No recipes match your filters.\nTry changing them!',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(fontSize: 16),
+                      ),
+                    );
+                  }
+
+                  return _SwipeDeck(recipes: filtered);
+                },
+              ),
             ),
           ],
         ),
@@ -67,284 +108,208 @@ class RecipeFilterScreen extends StatelessWidget {
 }
 
 class _SwipeDeck extends StatefulWidget {
-  const _SwipeDeck();
+  final List<Recipe> recipes;
+  const _SwipeDeck({required this.recipes});
 
   @override
   State<_SwipeDeck> createState() => _SwipeDeckState();
 }
 
-enum _SwipeAction { none, like, dislike }
-
 class _SwipeDeckState extends State<_SwipeDeck> {
-  Offset _dragOffset = Offset.zero;
-  double _rotation = 0.0;
-  bool _isDragging = false;
-  _SwipeAction _pendingAction = _SwipeAction.none;
-
-  void _resetCard() {
-    setState(() {
-      _dragOffset = Offset.zero;
-      _rotation = 0.0;
-      _isDragging = false;
-      _pendingAction = _SwipeAction.none;
-    });
-  }
-
-  void _animateOffScreen(_SwipeAction action, RecipeFilterViewModel vm) {
-    final targetOffset =
-        action == _SwipeAction.like ? const Offset(700, 0) : const Offset(-700, 0);
-
-    setState(() {
-      _pendingAction = action;
-      _isDragging = false;
-      _dragOffset = targetOffset;
-      _rotation = action == _SwipeAction.like ? 0.25 : -0.25;
-    });
-  }
-
-  void _handlePanEnd(
-      DragEndDetails details, RecipeFilterViewModel vm, Recipe current) {
-    final velocity = details.velocity.pixelsPerSecond;
-
-    if (velocity.dx > 500) {
-      _animateOffScreen(_SwipeAction.like, vm);
-      return;
-    } else if (velocity.dx < -500) {
-      _animateOffScreen(_SwipeAction.dislike, vm);
-      return;
-    }
-
-    if (velocity.dy < -500) {
-      // swipe up for details (no card advance yet)
-      _showDetails(context, current);
-      _resetCard();
-      return;
-    }
-
-    _resetCard();
-  }
-
-  void _showDetails(BuildContext context, Recipe recipe) {
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
-      ),
-      builder: (ctx) {
-        return DraggableScrollableSheet(
-          expand: false,
-          initialChildSize: 0.8,
-          minChildSize: 0.5,
-          maxChildSize: 0.95,
-          builder: (context, scrollController) {
-            return SingleChildScrollView(
-              controller: scrollController,
-              padding: const EdgeInsets.all(20),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Center(
-                    child: Container(
-                      width: 40,
-                      height: 4,
-                      margin: const EdgeInsets.only(bottom: 16),
-                      decoration: BoxDecoration(
-                        color: Colors.grey.shade300,
-                        borderRadius: BorderRadius.circular(999),
-                      ),
-                    ),
-                  ),
-                  Text(
-                    recipe.title,
-                    style: const TextStyle(
-                      fontSize: 22,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const SizedBox(height: 12),
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(16),
-                    child: Image.network(
-                      recipe.imageUrl,
-                      fit: BoxFit.cover,
-                      height: 220,
-                      width: double.infinity,
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-                  Wrap(
-                    spacing: 8,
-                    runSpacing: 4,
-                    children: [
-                      if (recipe.isCeliacSafe)
-                        _DetailTag(label: 'Celiac-safe'),
-                      if (recipe.isLactoseFree)
-                        _DetailTag(label: 'Lactose-free'),
-                      if (!recipe.isCeliacSafe)
-                        _DetailTag(label: 'Contains gluten'),
-                      if (!recipe.isLactoseFree)
-                        _DetailTag(label: 'Contains dairy'),
-                    ],
-                  ),
-                  const SizedBox(height: 20),
-                  const Text(
-                    'Ingredients',
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  const Text(
-                    '• Ingredient 1\n• Ingredient 2\n• Ingredient 3\n(Placeholder until API integration.)',
-                  ),
-                  const SizedBox(height: 16),
-                  const Text(
-                    'Instructions',
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  const Text(
-                    '1. Step one.\n2. Step two.\n3. Step three.\n\nPlaceholder instructions.',
-                  ),
-                ],
-              ),
-            );
-          },
-        );
-      },
-    );
-  }
+  final CardSwiperController _controller = CardSwiperController();
+  int _currentIndex = 0; // index of the card currently on top
 
   @override
   Widget build(BuildContext context) {
-    final vm = context.watch<RecipeFilterViewModel>();
-    final current = vm.currentRecipe;
-    final next = vm.nextRecipe;
-
-    void handleAnimationEnd() {
-      if (_pendingAction == _SwipeAction.like) {
-        vm.swipeRight();
-        _resetCard();
-      } else if (_pendingAction == _SwipeAction.dislike) {
-        vm.swipeLeft();
-        _resetCard();
-      }
-    }
-
-    if (current == null) {
-      // NOTE: This will show either when there are no filtered recipes
-      // OR when you've swiped through them all.
-      final count = vm.filteredRecipes.length;
-      return Center(
-        child: Text(
-          count == 0
-              ? 'No recipes match your filters.\nTry changing them!'
-              : 'No more recipes.\nYou’ve seen all $count matches.',
-          textAlign: TextAlign.center,
-          style: const TextStyle(fontSize: 16),
-        ),
-      );
-    }
+    final vm = context.read<RecipeFilterViewModel>();
 
     return Column(
       children: [
         Expanded(
-          child: Center(
-            child: Stack(
-              alignment: Alignment.center,
-              children: [
-                if (next != null)
-                  Transform.translate(
-                    offset: const Offset(0, 20),
-                    child: Transform.scale(
-                      scale: 0.95,
-                      child: Opacity(
-                        opacity: 0.7,
-                        child: RecipeCard(recipe: next),
-                      ),
-                    ),
-                  ),
-                GestureDetector(
-                  onPanStart: (_) {
-                    setState(() {
-                      _isDragging = true;
-                    });
-                  },
-                  onPanUpdate: (details) {
-                    setState(() {
-                      _dragOffset += details.delta;
-                      _rotation = _dragOffset.dx / 400;
-                    });
-                  },
-                  onPanEnd: (details) =>
-                      _handlePanEnd(details, vm, current),
-                  child: AnimatedContainer(
-                    duration: _isDragging
-                        ? Duration.zero
-                        : const Duration(milliseconds: 260),
-                    curve: Curves.easeOut,
-                    transform: Matrix4.identity()
-                      ..translate(_dragOffset.dx, _dragOffset.dy)
-                      ..rotateZ(_rotation),
-                    onEnd: handleAnimationEnd,
-                    child: RecipeCard(recipe: current),
-                  ),
-                ),
-              ],
+          child: CardSwiper(
+            controller: _controller,
+            cardsCount: widget.recipes.length,
+            isLoop: false,
+            allowedSwipeDirection: const AllowedSwipeDirection.only(
+              left: true,
+              right: true,
+              up: true,
             ),
+            cardBuilder: (context, index, hThreshold, vThreshold) {
+              // CardSwiper calls this with the card index being rendered
+              _currentIndex = index;
+              return RecipeCard(recipe: widget.recipes[index]);
+            },
+            onSwipe: (previousIndex, currentIndex, direction) {
+              // previousIndex is the card that was just swiped away
+              final recipe = widget.recipes[previousIndex];
+
+              if (direction == CardSwiperDirection.right) {
+                // Like
+                vm.like(recipe);
+              } else if (direction == CardSwiperDirection.top) {
+                // Show details but keep the card in place
+                _showDetails(context, recipe);
+                _controller.undo();
+              }
+
+              setState(() {
+                _currentIndex =
+                    currentIndex ?? widget.recipes.length; // might be null at end
+              });
+
+              return true; // accept the swipe
+            },
           ),
         ),
         const SizedBox(height: 12),
+
+        // Controls row: X, Up (details), Heart
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             IconButton(
               iconSize: 40,
-              onPressed: () {
-                _animateOffScreen(_SwipeAction.dislike, vm);
-              },
               icon: const Icon(Icons.close, color: Colors.redAccent),
+              onPressed: () {
+                _controller.swipe(CardSwiperDirection.left);
+              },
+            ),
+            const SizedBox(width: 24),
+            IconButton(
+              iconSize: 36,
+              icon: const Icon(Icons.arrow_upward),
+              onPressed: () {
+                if (_currentIndex >= 0 &&
+                    _currentIndex < widget.recipes.length) {
+                  final recipe = widget.recipes[_currentIndex];
+                  _showDetails(context, recipe);
+                }
+              },
             ),
             const SizedBox(width: 24),
             IconButton(
               iconSize: 40,
-              onPressed: () {
-                _animateOffScreen(_SwipeAction.like, vm);
-              },
               icon: const Icon(Icons.favorite, color: Colors.pinkAccent),
-            ),
-            const SizedBox(width: 24),
-            IconButton(
-              iconSize: 32,
               onPressed: () {
-                _showDetails(context, current);
+                _controller.swipe(CardSwiperDirection.right);
               },
-              icon: const Icon(Icons.arrow_upward),
-              tooltip: 'Details',
             ),
           ],
         ),
-        const SizedBox(height: 12),
       ],
     );
   }
 }
 
-class _DetailTag extends StatelessWidget {
+void _showDetails(BuildContext context, Recipe recipe) {
+  showModalBottomSheet(
+    context: context,
+    isScrollControlled: true,
+    shape: const RoundedRectangleBorder(
+      borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+    ),
+    builder: (ctx) {
+      return DraggableScrollableSheet(
+        expand: false,
+        initialChildSize: 0.85,
+        minChildSize: 0.5,
+        maxChildSize: 0.95,
+        builder: (context, scrollController) {
+          return SingleChildScrollView(
+            controller: scrollController,
+            padding: const EdgeInsets.all(20),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Drag handle
+                Center(
+                  child: Container(
+                    width: 40,
+                    height: 4,
+                    margin: const EdgeInsets.only(bottom: 16),
+                    decoration: BoxDecoration(
+                      color: Colors.grey.shade300,
+                      borderRadius: BorderRadius.circular(999),
+                    ),
+                  ),
+                ),
+                Text(
+                  recipe.title,
+                  style: const TextStyle(
+                    fontSize: 22,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const SizedBox(height: 12),
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(16),
+                  child: Image.network(
+                    recipe.imageUrl,
+                    fit: BoxFit.cover,
+                    height: 250,
+                    width: double.infinity,
+                    errorBuilder: (_, __, ___) => Container(
+                      color: Colors.grey.shade200,
+                      height: 250,
+                      alignment: Alignment.center,
+                      child: const Icon(Icons.restaurant, size: 40),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 16),
+                Row(
+                  children: [
+                    _DietTag(
+                      label: recipe.isCeliacSafe
+                          ? 'Gluten-free'
+                          : 'Contains gluten',
+                    ),
+                    const SizedBox(width: 8),
+                    _DietTag(
+                      label: recipe.isLactoseFree
+                          ? 'Dairy-free'
+                          : 'Contains dairy',
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 20),
+                const Text(
+                  'Summary',
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  _stripHtmlTags(recipe.summaryHtml),
+                  style: const TextStyle(fontSize: 15),
+                ),
+              ],
+            ),
+          );
+        },
+      );
+    },
+  );
+}
+
+class _DietTag extends StatelessWidget {
   final String label;
-  const _DetailTag({required this.label});
+  const _DietTag({required this.label});
 
   @override
   Widget build(BuildContext context) {
     return Chip(
-      label: Text(label),
+      label: Text(label, style: const TextStyle(fontSize: 12)),
       backgroundColor: Colors.teal.shade50,
       side: BorderSide(color: Colors.teal.shade200),
     );
   }
+}
+
+/// Remove basic HTML tags from Spoonacular summary
+String _stripHtmlTags(String html) {
+  return html.replaceAll(RegExp(r'<[^>]*>'), '');
 }
