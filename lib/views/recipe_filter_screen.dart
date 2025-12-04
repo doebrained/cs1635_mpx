@@ -107,6 +107,7 @@ class _RecipeFilterScreenState extends State<RecipeFilterScreen> {
   }
 }
 
+
 class _SwipeDeck extends StatefulWidget {
   final List<Recipe> recipes;
   const _SwipeDeck({required this.recipes});
@@ -136,29 +137,37 @@ class _SwipeDeckState extends State<_SwipeDeck> {
               up: true,
             ),
             cardBuilder: (context, index, hThreshold, vThreshold) {
-              // CardSwiper calls this with the card index being rendered
-              _currentIndex = index;
+              // IMPORTANT: don't update _currentIndex here
+              // This builder can be called for multiple indices
               return RecipeCard(recipe: widget.recipes[index]);
             },
             onSwipe: (previousIndex, currentIndex, direction) {
-              // previousIndex is the card that was just swiped away
               final recipe = widget.recipes[previousIndex];
 
               if (direction == CardSwiperDirection.right) {
-                // Like
+                // Like current card and move to next
                 vm.like(recipe);
-              } else if (direction == CardSwiperDirection.top) {
-                // Show details but keep the card in place
-                _showDetails(context, recipe);
-                _controller.undo();
+                setState(() {
+                  _currentIndex = currentIndex ?? widget.recipes.length;
+                });
+                return true; // accept swipe
               }
 
-              setState(() {
-                _currentIndex =
-                    currentIndex ?? widget.recipes.length; // might be null at end
-              });
+              if (direction == CardSwiperDirection.left) {
+                // Skip current card and move to next
+                setState(() {
+                  _currentIndex = currentIndex ?? widget.recipes.length;
+                });
+                return true; // accept swipe
+              }
 
-              return true; // accept the swipe
+              if (direction == CardSwiperDirection.top) {
+                // Show details but DO NOT advance the deck
+                _showDetails(context, recipe);
+                return false; // reject swipe, card snaps back
+              }
+
+              return true;
             },
           ),
         ),
