@@ -30,7 +30,7 @@ class _RecipeFilterScreenState extends State<RecipeFilterScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Swipe Recipes 🍽️'),
+        title: const Text('Swipe Recipes'),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16),
