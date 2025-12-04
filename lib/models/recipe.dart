@@ -19,7 +19,7 @@ class Recipe {
     return Recipe(
       id: json['id'] is int ? json['id'] as int : int.parse(json['id'].toString()),
       title: json['title'] ?? 'Untitled recipe',
-      imageUrl: json['image'] ?? '',              // 👈 THIS MUST MATCH API FIELD
+      imageUrl: json['image'] ?? '',              // THIS MUST MATCH API FIELD
       summaryHtml: json['summary'] ?? '',
       isCeliacSafe: json['glutenFree'] ?? false,  // from Spoonacular
       isLactoseFree: json['dairyFree'] ?? false,  // from Spoonacular
