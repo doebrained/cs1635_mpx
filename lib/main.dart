@@ -3,6 +3,8 @@ import 'package:provider/provider.dart';
 
 import 'viewmodels/recipe_filter_viewmodel.dart';
 import 'views/recipe_filter_screen.dart';
+import 'views/search_screen.dart';
+import 'views/saved_recipes_screen.dart';
 
 void main() {
   runApp(
@@ -25,7 +27,12 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.teal),
         useMaterial3: true,
       ),
-      home: const RecipeFilterScreen(),
+      initialRoute: '/',
+      routes: {
+        '/': (ctx) => const RecipeFilterScreen(),
+        '/search': (ctx) => const SearchScreen(),
+        '/saved': (ctx) => const SavedRecipesScreen(),
+      },
     );
   }
 }

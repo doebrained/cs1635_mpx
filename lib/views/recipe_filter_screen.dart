@@ -5,6 +5,7 @@ import 'package:flutter_card_swiper/flutter_card_swiper.dart';
 import '../viewmodels/recipe_filter_viewmodel.dart';
 import '../models/recipe.dart';
 import 'widgets/recipe_card.dart';
+import 'navigation_drawer.dart';
 
 class RecipeFilterScreen extends StatefulWidget {
   const RecipeFilterScreen({super.key});
@@ -32,6 +33,7 @@ class _RecipeFilterScreenState extends State<RecipeFilterScreen> {
       appBar: AppBar(
         title: const Text('Swipe Recipes'),
       ),
+      drawer: const AppNavigationDrawer(currentRoute: '/'),
       body: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
