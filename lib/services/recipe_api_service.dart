@@ -1,11 +1,7 @@
-// lib/services/recipe_api_service.dart
-
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 
-// Use the package-style import since your package is called "mpx"
-import 'package:mpx/api_config.dart';
-
+import '../api_config.dart';
 import '../models/recipe.dart';
 
 class RecipeApiService {
@@ -13,31 +9,32 @@ class RecipeApiService {
 
   RecipeApiService({http.Client? client}) : _client = client ?? http.Client();
 
-  Future<List<Recipe>> fetchRecipes() async {
+  // Public method your ViewModel already calls
+  Future<List<Recipe>> fetchRecipes({String query = 'chicken'}) async {
+    return searchRecipesByName(query);
+  }
+
+  // Actual MealDB call
+  Future<List<Recipe>> searchRecipesByName(String query) async {
     final uri = Uri.parse(
-      '${ApiConfig.spoonacularBaseUrl}/recipes/complexSearch',
-    ).replace(
-      queryParameters: {
-        'apiKey': ApiConfig.spoonacularApiKey,
-        'number': '20',
-        'addRecipeInformation': 'true',
-        'instructionsRequired': 'true',
-      },
+      '${ApiConfig.mealDbBaseUrl}/search.php?s=$query',
     );
 
     final response = await _client.get(uri);
 
     if (response.statusCode != 200) {
-      throw Exception(
-        'Failed to load recipes: ${response.statusCode} ${response.reasonPhrase}',
-      );
+      throw Exception('Failed to load recipes (${response.statusCode})');
     }
 
-    final Map<String, dynamic> decoded = json.decode(response.body);
-    final List<dynamic> results = decoded['results'] ?? [];
+    final data = json.decode(response.body) as Map<String, dynamic>;
+    final meals = data['meals'];
 
-    return results
-        .map((item) => Recipe.fromJson(item as Map<String, dynamic>))
+    if (meals == null) {
+      return [];
+    }
+
+    return (meals as List)
+        .map((mealJson) => Recipe.fromJson(mealJson as Map<String, dynamic>))
         .toList();
   }
 }
