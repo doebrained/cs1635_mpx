@@ -5,7 +5,7 @@ import 'package:flutter_card_swiper/flutter_card_swiper.dart';
 import '../viewmodels/recipe_filter_viewmodel.dart';
 import '../models/recipe.dart';
 import 'widgets/recipe_card.dart';
-import 'navigation_drawer.dart';
+import 'widgets/app_drawer.dart';
 
 class RecipeFilterScreen extends StatefulWidget {
   const RecipeFilterScreen({super.key});
@@ -18,7 +18,6 @@ class _RecipeFilterScreenState extends State<RecipeFilterScreen> {
   @override
   void initState() {
     super.initState();
-    // Load recipes from Spoonacular once when the screen is created
     Future.microtask(() {
       context.read<RecipeFilterViewModel>().loadRecipes();
     });
@@ -30,10 +29,10 @@ class _RecipeFilterScreenState extends State<RecipeFilterScreen> {
     final filtered = vm.filteredRecipes;
 
     return Scaffold(
+      drawer: AppDrawer(),
       appBar: AppBar(
         title: const Text('Swipe Recipes'),
       ),
-      drawer: const AppNavigationDrawer(currentRoute: '/'),
       body: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
@@ -45,7 +44,6 @@ class _RecipeFilterScreenState extends State<RecipeFilterScreen> {
             ),
             const SizedBox(height: 8),
 
-            // Filters stacked vertically
             Column(
               children: [
                 SwitchListTile(
@@ -64,43 +62,23 @@ class _RecipeFilterScreenState extends State<RecipeFilterScreen> {
             const SizedBox(height: 8),
             Text(
               'Matching recipes: ${filtered.length}',
-              style: const TextStyle(
-                fontSize: 14,
-                fontWeight: FontWeight.w500,
-              ),
+              style: const TextStyle(fontSize: 14),
             ),
             const Divider(),
-            const SizedBox(height: 8),
 
             Expanded(
-              child: Builder(
-                builder: (context) {
-                  if (vm.isLoading) {
-                    return const Center(child: CircularProgressIndicator());
-                  }
-
-                  if (vm.errorMessage != null) {
-                    return Center(
-                      child: Text(
-                        "⚠️ Error: ${vm.errorMessage}",
-                        textAlign: TextAlign.center,
-                      ),
-                    );
-                  }
-
-                  if (filtered.isEmpty) {
-                    return const Center(
-                      child: Text(
-                        'No recipes match your filters.\nTry changing them!',
-                        textAlign: TextAlign.center,
-                        style: TextStyle(fontSize: 16),
-                      ),
-                    );
-                  }
-
-                  return _SwipeDeck(recipes: filtered);
-                },
-              ),
+              child: vm.isLoading
+                  ? const Center(child: CircularProgressIndicator())
+                  : vm.errorMessage != null
+                      ? Center(child: Text("⚠️ Error: ${vm.errorMessage}"))
+                      : filtered.isEmpty
+                          ? const Center(
+                              child: Text(
+                                'No recipes match your filters.\nTry changing them!',
+                                textAlign: TextAlign.center,
+                              ),
+                            )
+                          : _SwipeDeck(recipes: filtered),
             ),
           ],
         ),
@@ -108,7 +86,6 @@ class _RecipeFilterScreenState extends State<RecipeFilterScreen> {
     );
   }
 }
-
 
 class _SwipeDeck extends StatefulWidget {
   final List<Recipe> recipes;
@@ -120,7 +97,7 @@ class _SwipeDeck extends StatefulWidget {
 
 class _SwipeDeckState extends State<_SwipeDeck> {
   final CardSwiperController _controller = CardSwiperController();
-  int _currentIndex = 0; // index of the card currently on top
+  int _currentIndex = 0;
 
   @override
   Widget build(BuildContext context) {
@@ -138,36 +115,23 @@ class _SwipeDeckState extends State<_SwipeDeck> {
               right: true,
               up: true,
             ),
-            cardBuilder: (context, index, hThreshold, vThreshold) {
-              // IMPORTANT: don't update _currentIndex here
-              // This builder can be called for multiple indices
+            cardBuilder: (context, index, _, __) {
+              _currentIndex = index;
               return RecipeCard(recipe: widget.recipes[index]);
             },
             onSwipe: (previousIndex, currentIndex, direction) {
               final recipe = widget.recipes[previousIndex];
 
               if (direction == CardSwiperDirection.right) {
-                // Like current card and move to next
                 vm.like(recipe);
-                setState(() {
-                  _currentIndex = currentIndex ?? widget.recipes.length;
-                });
-                return true; // accept swipe
-              }
-
-              if (direction == CardSwiperDirection.left) {
-                // Skip current card and move to next
-                setState(() {
-                  _currentIndex = currentIndex ?? widget.recipes.length;
-                });
-                return true; // accept swipe
-              }
-
-              if (direction == CardSwiperDirection.top) {
-                // Show details but DO NOT advance the deck
+              } else if (direction == CardSwiperDirection.top) {
                 _showDetails(context, recipe);
-                return false; // reject swipe, card snaps back
+                _controller.undo();
               }
+
+              setState(() {
+                _currentIndex = currentIndex ?? widget.recipes.length;
+              });
 
               return true;
             },
@@ -175,26 +139,21 @@ class _SwipeDeckState extends State<_SwipeDeck> {
         ),
         const SizedBox(height: 12),
 
-        // Controls row: X, Up (details), Heart
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             IconButton(
               iconSize: 40,
               icon: const Icon(Icons.close, color: Colors.redAccent),
-              onPressed: () {
-                _controller.swipe(CardSwiperDirection.left);
-              },
+              onPressed: () => _controller.swipe(CardSwiperDirection.left),
             ),
             const SizedBox(width: 24),
             IconButton(
               iconSize: 36,
               icon: const Icon(Icons.arrow_upward),
               onPressed: () {
-                if (_currentIndex >= 0 &&
-                    _currentIndex < widget.recipes.length) {
-                  final recipe = widget.recipes[_currentIndex];
-                  _showDetails(context, recipe);
+                if (_currentIndex < widget.recipes.length) {
+                  _showDetails(context, widget.recipes[_currentIndex]);
                 }
               },
             ),
@@ -202,9 +161,7 @@ class _SwipeDeckState extends State<_SwipeDeck> {
             IconButton(
               iconSize: 40,
               icon: const Icon(Icons.favorite, color: Colors.pinkAccent),
-              onPressed: () {
-                _controller.swipe(CardSwiperDirection.right);
-              },
+              onPressed: () => _controller.swipe(CardSwiperDirection.right),
             ),
           ],
         ),
@@ -220,12 +177,12 @@ void _showDetails(BuildContext context, Recipe recipe) {
     shape: const RoundedRectangleBorder(
       borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
     ),
-    builder: (ctx) {
+    builder: (_) {
       return DraggableScrollableSheet(
         expand: false,
         initialChildSize: 0.85,
-        minChildSize: 0.5,
         maxChildSize: 0.95,
+        minChildSize: 0.5,
         builder: (context, scrollController) {
           return SingleChildScrollView(
             controller: scrollController,
@@ -233,7 +190,6 @@ void _showDetails(BuildContext context, Recipe recipe) {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Drag handle
                 Center(
                   child: Container(
                     width: 40,
@@ -245,58 +201,17 @@ void _showDetails(BuildContext context, Recipe recipe) {
                     ),
                   ),
                 ),
-                Text(
-                  recipe.title,
-                  style: const TextStyle(
-                    fontSize: 22,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
+                Text(recipe.title, style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
                 const SizedBox(height: 12),
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(16),
-                  child: Image.network(
-                    recipe.imageUrl,
-                    fit: BoxFit.cover,
+                Image.network(recipe.imageUrl, height: 250, fit: BoxFit.cover,
+                  errorBuilder: (_, __, ___) => Container(
+                    color: Colors.grey.shade200,
                     height: 250,
-                    width: double.infinity,
-                    errorBuilder: (_, __, ___) => Container(
-                      color: Colors.grey.shade200,
-                      height: 250,
-                      alignment: Alignment.center,
-                      child: const Icon(Icons.restaurant, size: 40),
-                    ),
+                    child: const Center(child: Icon(Icons.restaurant)),
                   ),
                 ),
                 const SizedBox(height: 16),
-                Row(
-                  children: [
-                    _DietTag(
-                      label: recipe.isCeliacSafe
-                          ? 'Gluten-free'
-                          : 'Contains gluten',
-                    ),
-                    const SizedBox(width: 8),
-                    _DietTag(
-                      label: recipe.isLactoseFree
-                          ? 'Dairy-free'
-                          : 'Contains dairy',
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 20),
-                const Text(
-                  'Summary',
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-                const SizedBox(height: 8),
-                Text(
-                  _stripHtmlTags(recipe.summaryHtml),
-                  style: const TextStyle(fontSize: 15),
-                ),
+                Text(_stripHtmlTags(recipe.summaryHtml)),
               ],
             ),
           );
@@ -306,21 +221,5 @@ void _showDetails(BuildContext context, Recipe recipe) {
   );
 }
 
-class _DietTag extends StatelessWidget {
-  final String label;
-  const _DietTag({required this.label});
-
-  @override
-  Widget build(BuildContext context) {
-    return Chip(
-      label: Text(label, style: const TextStyle(fontSize: 12)),
-      backgroundColor: Colors.teal.shade50,
-      side: BorderSide(color: Colors.teal.shade200),
-    );
-  }
-}
-
-/// Remove basic HTML tags from Spoonacular summary
-String _stripHtmlTags(String html) {
-  return html.replaceAll(RegExp(r'<[^>]*>'), '');
-}
+String _stripHtmlTags(String html) =>
+    html.replaceAll(RegExp(r'<[^>]*>'), '');
