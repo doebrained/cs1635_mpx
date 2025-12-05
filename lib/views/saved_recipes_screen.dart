@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 
 import '../viewmodels/recipe_filter_viewmodel.dart';
 import 'widgets/recipe_card.dart';
+import 'widgets/recipe_detail_sheet.dart';
 
 class SavedRecipesScreen extends StatelessWidget {
   const SavedRecipesScreen({super.key});
@@ -32,7 +33,10 @@ class SavedRecipesScreen extends StatelessWidget {
                   padding: const EdgeInsets.only(bottom: 16),
                   child: SizedBox(
                     height: 300,
-                    child: RecipeCard(recipe: recipe),
+                    child: RecipeCard(
+                      recipe: recipe,
+                      onTap: () => showRecipeDetailSheet(context, recipe),
+                    ),
                   ),
                 );
               },
@@ -40,3 +44,4 @@ class SavedRecipesScreen extends StatelessWidget {
     );
   }
 }
+

@@ -6,6 +6,7 @@ import '../viewmodels/recipe_filter_viewmodel.dart';
 import '../models/recipe.dart';
 import 'widgets/recipe_card.dart';
 import 'widgets/app_drawer.dart';
+import 'widgets/recipe_detail_sheet.dart';
 
 class RecipeFilterScreen extends StatefulWidget {
   const RecipeFilterScreen({super.key});
@@ -128,7 +129,7 @@ class _RecipeFilterScreenState extends State<RecipeFilterScreen> {
   } else if (direction == CardSwiperDirection.left) {
     vm.reject(recipe);
   } else if (direction == CardSwiperDirection.top) {
-    _showDetails(context, recipe);
+    showRecipeDetailSheet(context, recipe);
     _controller.undo(); // keep the same card on top
   }
 
@@ -164,7 +165,7 @@ class _RecipeFilterScreenState extends State<RecipeFilterScreen> {
               icon: const Icon(Icons.arrow_upward),
               onPressed: () {
                 if (_currentIndex < widget.recipes.length) {
-                  _showDetails(context, widget.recipes[_currentIndex]);
+                  showRecipeDetailSheet(context, widget.recipes[_currentIndex]);
                 }
               },
             ),
@@ -181,57 +182,4 @@ class _RecipeFilterScreenState extends State<RecipeFilterScreen> {
   }
 }
 
-void _showDetails(BuildContext context, Recipe recipe) {
-  showModalBottomSheet(
-    context: context,
-    isScrollControlled: true,
-    shape: const RoundedRectangleBorder(
-      borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
-    ),
-    builder: (_) {
-      return DraggableScrollableSheet(
-        expand: false,
-        initialChildSize: 0.85,
-        maxChildSize: 0.95,
-        minChildSize: 0.5,
-        builder: (context, scrollController) {
-          return SingleChildScrollView(
-            controller: scrollController,
-            padding: const EdgeInsets.all(20),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Center(
-                  child: Container(
-                    width: 40,
-                    height: 4,
-                    margin: const EdgeInsets.only(bottom: 16),
-                    decoration: BoxDecoration(
-                      color: Colors.grey.shade300,
-                      borderRadius: BorderRadius.circular(999),
-                    ),
-                  ),
-                ),
-                Text(recipe.title, style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
-                const SizedBox(height: 12),
-                Image.network(recipe.imageUrl, height: 250, fit: BoxFit.cover,
-                  errorBuilder: (_, __, ___) => Container(
-                    color: Colors.grey.shade200,
-                    height: 250,
-                    child: const Center(child: Icon(Icons.restaurant)),
-                  ),
-                ),
-                const SizedBox(height: 16),
-   Text(
-  recipe.summary, 
-),
-
-
-              ],
-            ),
-          );
-        },
-      );
-    },
-  );
-}
+// Use shared `showRecipeDetailSheet` from widgets/recipe_detail_sheet.dart
