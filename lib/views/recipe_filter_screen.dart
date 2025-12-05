@@ -125,6 +125,8 @@ class _RecipeFilterScreenState extends State<RecipeFilterScreen> {
 
   if (direction == CardSwiperDirection.right) {
     vm.like(recipe);
+  } else if (direction == CardSwiperDirection.left) {
+    vm.reject(recipe);
   } else if (direction == CardSwiperDirection.top) {
     _showDetails(context, recipe);
     _controller.undo(); // keep the same card on top
