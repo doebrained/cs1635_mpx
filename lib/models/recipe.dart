@@ -1,56 +1,133 @@
 class Recipe {
-  final int id;
+  final String id;
   final String title;
   final String imageUrl;
-  final String summaryHtml;
+  final String instructions;
+  final String sourceUrl;
+  final String area;
+  final String category;
+  final List<String> ingredients;
 
-  // Existing
-  final bool isCeliacSafe;   // glutenFree
-  final bool isLactoseFree;  // dairyFree
-
-  // New
-  final bool isVegetarian;   // vegetarian
-  final bool isVegan;        // vegan
-  final bool isKeto;         // ketogenic
-  final bool isNutFree;      // you'll likely set this yourself
-
-  const Recipe({
+  Recipe({
     required this.id,
     required this.title,
     required this.imageUrl,
-    required this.summaryHtml,
-    required this.isCeliacSafe,
-    required this.isLactoseFree,
-    required this.isVegetarian,
-    required this.isVegan,
-    required this.isKeto,
-    required this.isNutFree,
+    required this.instructions,
+    required this.sourceUrl,
+    required this.area,
+    required this.category,
+    required this.ingredients,
   });
 
   factory Recipe.fromJson(Map<String, dynamic> json) {
-    // Spoonacular booleans are literally true/false, but we guard anyway
-    bool asBool(dynamic value) => value == true;
+    // Parse ingredient/measure pairs from TheMealDB
+    final ingredients = <String>[];
+    for (int i = 1; i <= 20; i++) {
+      final ingredient = (json['strIngredient$i'] ?? '').toString().trim();
+      final measure = (json['strMeasure$i'] ?? '').toString().trim();
+
+      if (ingredient.isNotEmpty &&
+          ingredient.toLowerCase() != 'null') {
+        final entry = (measure.isNotEmpty &&
+                measure.toLowerCase() != 'null')
+            ? '$ingredient — $measure'
+            : ingredient;
+        ingredients.add(entry);
+      }
+    }
 
     return Recipe(
-      id: json['id'] is int
-          ? json['id'] as int
-          : int.parse(json['id'].toString()),
-      title: json['title'] ?? 'Untitled recipe',
-      imageUrl: json['image'] ?? '',
-      summaryHtml: json['summary'] ?? '',
-
-      // existing
-      isCeliacSafe: asBool(json['glutenFree']),
-      isLactoseFree: asBool(json['dairyFree']),
-
-      // new (Spoonacular fields)
-      isVegetarian: asBool(json['vegetarian']),
-      isVegan: asBool(json['vegan']),
-      isKeto: asBool(json['ketogenic']), // Spoonacular uses "ketogenic"
-
-      // Spoonacular doesn't give a direct "nutFree" flag; for now we just
-      // read a custom field if you add it, otherwise default to false.
-      isNutFree: asBool(json['nutFree']),
+      id: json['idMeal'] ?? '',
+      title: json['strMeal'] ?? '',
+      imageUrl: json['strMealThumb'] ?? '',
+      instructions: json['strInstructions'] ?? '',
+      sourceUrl: json['strSource'] ?? '',
+      area: json['strArea'] ?? '',
+      category: json['strCategory'] ?? '',
+      ingredients: ingredients,
     );
+  }
+
+  /// --- Allergen Detection ---
+
+  bool get isCeliacSafe {
+    final text = (ingredients.join(' ') + ' ' + instructions).toLowerCase();
+
+    // Confirmed safe keywords
+    const safeHints = ['gluten free', 'gluten-free', 'gf'];
+    if (safeHints.any((k) => text.contains(k))) return true;
+
+    // Common gluten-containing ingredients
+    const glutenKeywords = [
+      'wheat',
+      'barley',
+      'rye',
+      'malt',
+      'semolina',
+      'spelt',
+      'farro',
+      'bulgur',
+      'couscous',
+      'flour',
+      'bread',
+      'pasta',
+      'noodles',
+      'breadcrumbs',
+      'cracker',
+      'tortilla',
+    ];
+
+    if (glutenKeywords.any((k) => text.contains(k))) return false;
+
+    return true; // Default: assume safe
+  }
+
+  bool get isLactoseFree {
+    final text = (ingredients.join(' ') + ' ' + instructions).toLowerCase();
+
+    const dairyKeywords = [
+      'milk',
+      'cream',
+      'cheese',
+      'parmesan',
+      'mozzarella',
+      'cheddar',
+      'butter',
+      'yogurt',
+      'custard',
+      'sour cream',
+      'whipped cream',
+      'ghee',
+    ];
+
+    const safeHints = [
+      'dairy free',
+      'dairy-free',
+      'lactose free',
+      'lactose-free',
+      'vegan',
+    ];
+    if (safeHints.any((k) => text.contains(k))) return true;
+
+    if (dairyKeywords.any((k) => text.contains(k))) return false;
+
+    return true;
+  }
+
+  /// --- Summary used in your UI (ingredients + instructions) ---
+  String get summary {
+    final ingPart = ingredients.isNotEmpty
+        ? 'Ingredients: ${ingredients.take(4).join(', ')}'
+            '${ingredients.length > 4 ? '...' : ''}'
+        : '';
+
+    final instructPart = instructions.isNotEmpty
+        ? 'Instructions: ${instructions.split('.').first.trim()}.'
+        : '';
+
+    if (ingPart.isNotEmpty && instructPart.isNotEmpty) {
+      return '$ingPart\n$instructPart';
+    }
+    return ingPart.isNotEmpty ? ingPart : instructPart;
   }
 }
