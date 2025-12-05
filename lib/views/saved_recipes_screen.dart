@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../viewmodels/recipe_filter_viewmodel.dart';
+import 'navigation_drawer.dart';
 import 'widgets/recipe_card.dart';
 import 'widgets/recipe_detail_sheet.dart';
 
@@ -14,6 +15,7 @@ class SavedRecipesScreen extends StatelessWidget {
     final saved = vm.likedRecipes;
 
     return Scaffold(
+      drawer: const AppNavigationDrawer(currentRoute: '/saved'),
       appBar: AppBar(title: const Text("Saved Recipes")),
       body: saved.isEmpty
           ? const Center(
