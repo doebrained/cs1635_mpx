@@ -14,8 +14,10 @@ class AppDrawer extends StatelessWidget {
         children: [
           const DrawerHeader(
             decoration: BoxDecoration(color: Colors.teal),
-            child: Text("Menu",
-                style: TextStyle(fontSize: 22, color: Colors.white)),
+            child: Text(
+              "Menu",
+              style: TextStyle(fontSize: 22, color: Colors.white),
+            ),
           ),
 
           ListTile(

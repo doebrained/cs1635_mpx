@@ -41,7 +41,13 @@ class _RecipeDetailSheet extends StatelessWidget {
                   ),
                 ),
               ),
-              Text(recipe.title, style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
+              Text(
+                recipe.title,
+                style: const TextStyle(
+                  fontSize: 22,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
               const SizedBox(height: 12),
               if (recipe.imageUrl.isNotEmpty)
                 ClipRRect(
@@ -68,19 +74,29 @@ class _RecipeDetailSheet extends StatelessWidget {
               Row(
                 children: [
                   if (recipe.area.isNotEmpty) Text('Area: ${recipe.area}'),
-                  if (recipe.area.isNotEmpty && recipe.category.isNotEmpty) const SizedBox(width: 12),
-                  if (recipe.category.isNotEmpty) Text('Category: ${recipe.category}'),
+                  if (recipe.area.isNotEmpty && recipe.category.isNotEmpty)
+                    const SizedBox(width: 12),
+                  if (recipe.category.isNotEmpty)
+                    Text('Category: ${recipe.category}'),
                 ],
               ),
               const SizedBox(height: 16),
-              const Text('Ingredients', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+              const Text(
+                'Ingredients',
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+              ),
               const SizedBox(height: 8),
-              ...recipe.ingredients.map((ing) => Padding(
-                    padding: const EdgeInsets.only(bottom: 6),
-                    child: Text('• $ing'),
-                  )),
+              ...recipe.ingredients.map(
+                (ing) => Padding(
+                  padding: const EdgeInsets.only(bottom: 6),
+                  child: Text('• $ing'),
+                ),
+              ),
               const SizedBox(height: 16),
-              const Text('Instructions', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+              const Text(
+                'Instructions',
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+              ),
               const SizedBox(height: 8),
               Text(recipe.instructions),
               const SizedBox(height: 24),

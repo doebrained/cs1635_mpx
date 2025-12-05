@@ -16,9 +16,7 @@ class RecipeApiService {
 
   // Actual MealDB call
   Future<List<Recipe>> searchRecipesByName(String query) async {
-    final uri = Uri.parse(
-      '${ApiConfig.mealDbBaseUrl}/search.php?s=$query',
-    );
+    final uri = Uri.parse('${ApiConfig.mealDbBaseUrl}/search.php?s=$query');
 
     final response = await _client.get(uri);
 

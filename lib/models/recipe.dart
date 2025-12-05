@@ -26,10 +26,8 @@ class Recipe {
       final ingredient = (json['strIngredient$i'] ?? '').toString().trim();
       final measure = (json['strMeasure$i'] ?? '').toString().trim();
 
-      if (ingredient.isNotEmpty &&
-          ingredient.toLowerCase() != 'null') {
-        final entry = (measure.isNotEmpty &&
-                measure.toLowerCase() != 'null')
+      if (ingredient.isNotEmpty && ingredient.toLowerCase() != 'null') {
+        final entry = (measure.isNotEmpty && measure.toLowerCase() != 'null')
             ? '$ingredient — $measure'
             : ingredient;
         ingredients.add(entry);
@@ -118,7 +116,7 @@ class Recipe {
   String get summary {
     final ingPart = ingredients.isNotEmpty
         ? 'Ingredients: ${ingredients.take(4).join(', ')}'
-            '${ingredients.length > 4 ? '...' : ''}'
+              '${ingredients.length > 4 ? '...' : ''}'
         : '';
 
     final instructPart = instructions.isNotEmpty

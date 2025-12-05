@@ -44,4 +44,3 @@ class SavedRecipesScreen extends StatelessWidget {
     );
   }
 }
-

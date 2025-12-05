@@ -15,10 +15,7 @@ class TagChip extends StatelessWidget {
       ),
       child: Text(
         label,
-        style: TextStyle(
-          fontSize: 11,
-          color: Colors.grey.shade800,
-        ),
+        style: TextStyle(fontSize: 11, color: Colors.grey.shade800),
       ),
     );
   }

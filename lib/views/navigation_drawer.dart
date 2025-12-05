@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 
 class AppNavigationDrawer extends StatelessWidget {
   final String currentRoute;
-  const AppNavigationDrawer({Key? key, required this.currentRoute}) : super(key: key);
+  const AppNavigationDrawer({Key? key, required this.currentRoute})
+    : super(key: key);
 
   void _navigate(BuildContext context, String route) {
     if (route == currentRoute) {
@@ -32,9 +33,27 @@ class AppNavigationDrawer extends StatelessWidget {
                 ),
               ),
             ),
-            _buildItem(context, Icons.dashboard, 'Recipe Cards', '/', currentRoute),
-            _buildItem(context, Icons.search, 'Search', '/search', currentRoute),
-            _buildItem(context, Icons.bookmark, 'Saved Recipes', '/saved', currentRoute),
+            _buildItem(
+              context,
+              Icons.dashboard,
+              'Recipe Cards',
+              '/',
+              currentRoute,
+            ),
+            _buildItem(
+              context,
+              Icons.search,
+              'Search',
+              '/search',
+              currentRoute,
+            ),
+            _buildItem(
+              context,
+              Icons.bookmark,
+              'Saved Recipes',
+              '/saved',
+              currentRoute,
+            ),
             const Spacer(),
             Padding(
               padding: const EdgeInsets.all(12.0),
@@ -42,18 +61,32 @@ class AppNavigationDrawer extends StatelessWidget {
                 'v1.0',
                 style: TextStyle(color: Colors.grey.shade600),
               ),
-            )
+            ),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildItem(BuildContext context, IconData icon, String label, String route, String current) {
+  Widget _buildItem(
+    BuildContext context,
+    IconData icon,
+    String label,
+    String route,
+    String current,
+  ) {
     final selected = route == current;
     return ListTile(
-      leading: Icon(icon, color: selected ? Theme.of(context).colorScheme.primary : null),
-      title: Text(label, style: TextStyle(color: selected ? Theme.of(context).colorScheme.primary : null)),
+      leading: Icon(
+        icon,
+        color: selected ? Theme.of(context).colorScheme.primary : null,
+      ),
+      title: Text(
+        label,
+        style: TextStyle(
+          color: selected ? Theme.of(context).colorScheme.primary : null,
+        ),
+      ),
       selected: selected,
       onTap: () => _navigate(context, route),
     );

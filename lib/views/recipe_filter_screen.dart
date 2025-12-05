@@ -31,9 +31,7 @@ class _RecipeFilterScreenState extends State<RecipeFilterScreen> {
 
     return Scaffold(
       drawer: AppDrawer(),
-      appBar: AppBar(
-        title: const Text('Swipe Recipes'),
-      ),
+      appBar: AppBar(title: const Text('Swipe Recipes')),
       body: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
@@ -71,15 +69,15 @@ class _RecipeFilterScreenState extends State<RecipeFilterScreen> {
               child: vm.isLoading
                   ? const Center(child: CircularProgressIndicator())
                   : vm.errorMessage != null
-                      ? Center(child: Text("⚠️ Error: ${vm.errorMessage}"))
-                      : filtered.isEmpty
-                          ? const Center(
-                              child: Text(
-                                'No recipes match your filters.\nTry changing them!',
-                                textAlign: TextAlign.center,
-                              ),
-                            )
-                          : _SwipeDeck(recipes: filtered),
+                  ? Center(child: Text("⚠️ Error: ${vm.errorMessage}"))
+                  : filtered.isEmpty
+                  ? const Center(
+                      child: Text(
+                        'No recipes match your filters.\nTry changing them!',
+                        textAlign: TextAlign.center,
+                      ),
+                    )
+                  : _SwipeDeck(recipes: filtered),
             ),
           ],
         ),
@@ -88,65 +86,63 @@ class _RecipeFilterScreenState extends State<RecipeFilterScreen> {
   }
 }
 
-      class _SwipeDeck extends StatefulWidget {
-        final List<Recipe> recipes;
-        const _SwipeDeck({required this.recipes});
+class _SwipeDeck extends StatefulWidget {
+  final List<Recipe> recipes;
+  const _SwipeDeck({required this.recipes});
 
-        @override
-        State<_SwipeDeck> createState() => _SwipeDeckState();
-      }
+  @override
+  State<_SwipeDeck> createState() => _SwipeDeckState();
+}
 
-      class _SwipeDeckState extends State<_SwipeDeck> {
-        final CardSwiperController _controller = CardSwiperController();
-        int _currentIndex = 0;
+class _SwipeDeckState extends State<_SwipeDeck> {
+  final CardSwiperController _controller = CardSwiperController();
+  int _currentIndex = 0;
 
-        @override
-        Widget build(BuildContext context) {
-          final vm = context.read<RecipeFilterViewModel>();
+  @override
+  Widget build(BuildContext context) {
+    final vm = context.read<RecipeFilterViewModel>();
 
-          return Column(
-            children: [
-              Expanded(
-                child: CardSwiper(
-                  controller: _controller,
-                  cardsCount: widget.recipes.length,
-                  isLoop: false,
-                  allowedSwipeDirection: const AllowedSwipeDirection.only(
-                    left: true,
-                    right: true,
-                    up: true,
-                  ),
-                  cardBuilder: (context, index, _, __) {
-                    return RecipeCard(recipe: widget.recipes[index]);
-                  },
+    return Column(
+      children: [
+        Expanded(
+          child: CardSwiper(
+            controller: _controller,
+            cardsCount: widget.recipes.length,
+            isLoop: false,
+            allowedSwipeDirection: const AllowedSwipeDirection.only(
+              left: true,
+              right: true,
+              up: true,
+            ),
+            cardBuilder: (context, index, _, __) {
+              return RecipeCard(recipe: widget.recipes[index]);
+            },
 
-  onSwipe: (previousIndex, currentIndex, direction) {
-  final swipedIndex = previousIndex;
-  final recipe = widget.recipes[swipedIndex];
+            onSwipe: (previousIndex, currentIndex, direction) {
+              final swipedIndex = previousIndex;
+              final recipe = widget.recipes[swipedIndex];
 
-  if (direction == CardSwiperDirection.right) {
-    vm.like(recipe);
-  } else if (direction == CardSwiperDirection.left) {
-    vm.reject(recipe);
-  } else if (direction == CardSwiperDirection.top) {
-    showRecipeDetailSheet(context, recipe);
-    _controller.undo(); // keep the same card on top
-  }
+              if (direction == CardSwiperDirection.right) {
+                vm.like(recipe);
+              } else if (direction == CardSwiperDirection.left) {
+                vm.reject(recipe);
+              } else if (direction == CardSwiperDirection.top) {
+                showRecipeDetailSheet(context, recipe);
+                _controller.undo(); // keep the same card on top
+              }
 
-  setState(() {
-    if (direction == CardSwiperDirection.top) {
-      // card stays the same
-      _currentIndex = swipedIndex;
-    } else {
-      // moved to next card
-      _currentIndex = currentIndex ?? widget.recipes.length;
-    }
-  });
+              setState(() {
+                if (direction == CardSwiperDirection.top) {
+                  // card stays the same
+                  _currentIndex = swipedIndex;
+                } else {
+                  // moved to next card
+                  _currentIndex = currentIndex ?? widget.recipes.length;
+                }
+              });
 
-  return true;
-},
-
-
+              return true;
+            },
           ),
         ),
         const SizedBox(height: 12),

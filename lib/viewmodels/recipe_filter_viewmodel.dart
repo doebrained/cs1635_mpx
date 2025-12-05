@@ -7,7 +7,7 @@ class RecipeFilterViewModel extends ChangeNotifier {
   final RecipeApiService _apiService;
 
   RecipeFilterViewModel({RecipeApiService? apiService})
-      : _apiService = apiService ?? RecipeApiService();
+    : _apiService = apiService ?? RecipeApiService();
 
   bool _celiacOnly = false;
   bool _lactoseOnly = false;
