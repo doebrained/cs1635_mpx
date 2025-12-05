@@ -1,9 +1,6 @@
 // lib/api_config.dart
 
-// DO NOT COMMIT THIS FILE (it's already in .gitignore).
-
 class ApiConfig {
-  static const String spoonacularApiKey = '1e698266625c410c93d84735a7f5cd85';
-
-  static const String spoonacularBaseUrl = 'https://api.spoonacular.com';
+  // TheMealDB has a free, no-auth test key "1"
+  static const String mealDbBaseUrl = 'https://www.themealdb.com/api/json/v1/1';
 }
