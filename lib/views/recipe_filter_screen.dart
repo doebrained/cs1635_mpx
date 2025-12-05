@@ -87,54 +87,63 @@ class _RecipeFilterScreenState extends State<RecipeFilterScreen> {
   }
 }
 
-class _SwipeDeck extends StatefulWidget {
-  final List<Recipe> recipes;
-  const _SwipeDeck({required this.recipes});
+      class _SwipeDeck extends StatefulWidget {
+        final List<Recipe> recipes;
+        const _SwipeDeck({required this.recipes});
 
-  @override
-  State<_SwipeDeck> createState() => _SwipeDeckState();
-}
+        @override
+        State<_SwipeDeck> createState() => _SwipeDeckState();
+      }
 
-class _SwipeDeckState extends State<_SwipeDeck> {
-  final CardSwiperController _controller = CardSwiperController();
-  int _currentIndex = 0;
+      class _SwipeDeckState extends State<_SwipeDeck> {
+        final CardSwiperController _controller = CardSwiperController();
+        int _currentIndex = 0;
 
-  @override
-  Widget build(BuildContext context) {
-    final vm = context.read<RecipeFilterViewModel>();
+        @override
+        Widget build(BuildContext context) {
+          final vm = context.read<RecipeFilterViewModel>();
 
-    return Column(
-      children: [
-        Expanded(
-          child: CardSwiper(
-            controller: _controller,
-            cardsCount: widget.recipes.length,
-            isLoop: false,
-            allowedSwipeDirection: const AllowedSwipeDirection.only(
-              left: true,
-              right: true,
-              up: true,
-            ),
-            cardBuilder: (context, index, _, __) {
-              _currentIndex = index;
-              return RecipeCard(recipe: widget.recipes[index]);
-            },
-            onSwipe: (previousIndex, currentIndex, direction) {
-              final recipe = widget.recipes[previousIndex];
+          return Column(
+            children: [
+              Expanded(
+                child: CardSwiper(
+                  controller: _controller,
+                  cardsCount: widget.recipes.length,
+                  isLoop: false,
+                  allowedSwipeDirection: const AllowedSwipeDirection.only(
+                    left: true,
+                    right: true,
+                    up: true,
+                  ),
+                  cardBuilder: (context, index, _, __) {
+                    return RecipeCard(recipe: widget.recipes[index]);
+                  },
 
-              if (direction == CardSwiperDirection.right) {
-                vm.like(recipe);
-              } else if (direction == CardSwiperDirection.top) {
-                _showDetails(context, recipe);
-                _controller.undo();
-              }
+  onSwipe: (previousIndex, currentIndex, direction) {
+  final swipedIndex = previousIndex;
+  final recipe = widget.recipes[swipedIndex];
 
-              setState(() {
-                _currentIndex = currentIndex ?? widget.recipes.length;
-              });
+  if (direction == CardSwiperDirection.right) {
+    vm.like(recipe);
+  } else if (direction == CardSwiperDirection.top) {
+    _showDetails(context, recipe);
+    _controller.undo(); // keep the same card on top
+  }
 
-              return true;
-            },
+  setState(() {
+    if (direction == CardSwiperDirection.top) {
+      // card stays the same
+      _currentIndex = swipedIndex;
+    } else {
+      // moved to next card
+      _currentIndex = currentIndex ?? widget.recipes.length;
+    }
+  });
+
+  return true;
+},
+
+
           ),
         ),
         const SizedBox(height: 12),
@@ -211,7 +220,11 @@ void _showDetails(BuildContext context, Recipe recipe) {
                   ),
                 ),
                 const SizedBox(height: 16),
-                Text(_stripHtmlTags(recipe.summaryHtml)),
+   Text(
+  recipe.summary, 
+),
+
+
               ],
             ),
           );
@@ -220,6 +233,3 @@ void _showDetails(BuildContext context, Recipe recipe) {
     },
   );
 }
-
-String _stripHtmlTags(String html) =>
-    html.replaceAll(RegExp(r'<[^>]*>'), '');
