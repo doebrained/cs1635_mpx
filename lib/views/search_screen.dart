@@ -1,31 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import '../viewmodels/recipe_filter_viewmodel.dart';
-import '../models/recipe.dart';
+import '../viewmodels/search_viewmodel.dart';
 import 'navigation_drawer.dart';
+import 'widgets/recipe_detail_sheet.dart';
 
-class SearchScreen extends StatefulWidget {
+class SearchScreen extends StatelessWidget {
   const SearchScreen({Key? key}) : super(key: key);
 
   @override
-  State<SearchScreen> createState() => _SearchScreenState();
-}
-
-class _SearchScreenState extends State<SearchScreen> {
-  String _query = "";
-
-  @override
   Widget build(BuildContext context) {
-    final vm = context.watch<RecipeFilterViewModel>();
-    final List<Recipe> all = vm.allRecipes;
-
-    // Filter recipes by title
-    final List<Recipe> results = _query.isEmpty
-        ? []
-        : all
-            .where((r) => r.title.toLowerCase().contains(_query.toLowerCase()))
-            .toList();
+    final searchVm = context.watch<SearchViewModel>();
 
     return Scaffold(
       drawer: const AppNavigationDrawer(currentRoute: '/search'),
@@ -36,21 +21,19 @@ class _SearchScreenState extends State<SearchScreen> {
             hintText: "Search recipes...",
             border: InputBorder.none,
           ),
-          onChanged: (value) {
-            setState(() => _query = value);
-          },
+          onChanged: (value) => searchVm.updateQuery(value),
         ),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16),
-        child: _query.isEmpty
+        child: searchVm.query.isEmpty
             ? const Center(
                 child: Text(
                   "Type in the search bar to find recipes.",
                   textAlign: TextAlign.center,
                 ),
               )
-            : results.isEmpty
+            : searchVm.searchResults.isEmpty
                 ? const Center(
                     child: Text(
                       "No recipes found.",
@@ -58,18 +41,17 @@ class _SearchScreenState extends State<SearchScreen> {
                     ),
                   )
                 : ListView.builder(
-                    itemCount: results.length,
+                    itemCount: searchVm.searchResults.length,
                     itemBuilder: (context, index) {
-                      final recipe = results[index];
+                      final recipe = searchVm.searchResults[index];
                       return ListTile(
                         title: Text(recipe.title),
                         subtitle: Text(recipe.isCeliacSafe
                             ? "Gluten-free"
                             : "Contains gluten"),
                         trailing: const Icon(Icons.arrow_forward_ios, size: 16),
-                        onTap: () {
-                          // OPTIONAL: Show details modal
-                        },
+                        onTap: () =>
+                            showRecipeDetailSheet(context, recipe),
                       );
                     },
                   ),

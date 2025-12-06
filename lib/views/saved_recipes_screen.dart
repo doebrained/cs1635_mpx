@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import '../viewmodels/recipe_filter_viewmodel.dart';
+import '../viewmodels/saved_recipes_viewmodel.dart';
 import 'navigation_drawer.dart';
 import 'widgets/recipe_card.dart';
 import 'widgets/recipe_detail_sheet.dart';
@@ -11,8 +11,8 @@ class SavedRecipesScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final vm = context.watch<RecipeFilterViewModel>();
-    final saved = vm.likedRecipes;
+    final vm = context.watch<SavedRecipesViewModel>();
+    final saved = vm.savedRecipes;
 
     return Scaffold(
       drawer: const AppNavigationDrawer(currentRoute: '/saved'),
