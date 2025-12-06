@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_card_swiper/flutter_card_swiper.dart';
 
-import '../theme/app_theme.dart';import '../viewmodels/recipe_filter_viewmodel.dart';
+import '../theme/app_theme.dart';
+import '../viewmodels/recipe_filter_viewmodel.dart';
 import '../models/recipe.dart';
 import 'widgets/recipe_card.dart';
 import 'navigation_drawer.dart';
