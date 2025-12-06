@@ -7,7 +7,7 @@ class SearchViewModel extends ChangeNotifier {
   List<Recipe> _cachedResults = [];
 
   SearchViewModel({required List<Recipe> allRecipes})
-      : _allRecipes = allRecipes;
+    : _allRecipes = allRecipes;
 
   String get query => _query;
 

@@ -5,6 +5,8 @@ import '../viewmodels/saved_recipes_viewmodel.dart';
 import 'navigation_drawer.dart';
 import 'widgets/recipe_card.dart';
 import 'widgets/recipe_detail_sheet.dart';
+import 'widgets/fade_in_widget.dart';
+import 'widgets/staggered_list_item.dart';
 
 class SavedRecipesScreen extends StatelessWidget {
   const SavedRecipesScreen({super.key});
@@ -25,23 +27,30 @@ class SavedRecipesScreen extends StatelessWidget {
                 style: TextStyle(fontSize: 16),
               ),
             )
-          : ListView.builder(
-              padding: const EdgeInsets.all(16),
-              itemCount: saved.length,
-              itemBuilder: (context, index) {
-                final recipe = saved[index];
+          : FadeInWidget(
+              duration: const Duration(milliseconds: 400),
+              child: ListView.builder(
+                padding: const EdgeInsets.all(16),
+                itemCount: saved.length,
+                itemBuilder: (context, index) {
+                  final recipe = saved[index];
 
-                return Padding(
-                  padding: const EdgeInsets.only(bottom: 16),
-                  child: SizedBox(
-                    height: 300,
-                    child: RecipeCard(
-                      recipe: recipe,
-                      onTap: () => showRecipeDetailSheet(context, recipe),
+                  return StaggeredListItem(
+                    index: index,
+                    delay: Duration(milliseconds: 50 * index),
+                    child: Padding(
+                      padding: const EdgeInsets.only(bottom: 16),
+                      child: SizedBox(
+                        height: 300,
+                        child: RecipeCard(
+                          recipe: recipe,
+                          onTap: () => showRecipeDetailSheet(context, recipe),
+                        ),
+                      ),
                     ),
-                  ),
-                );
-              },
+                  );
+                },
+              ),
             ),
     );
   }

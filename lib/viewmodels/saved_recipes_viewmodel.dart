@@ -5,7 +5,7 @@ class SavedRecipesViewModel extends ChangeNotifier {
   final List<Recipe> _likedRecipes;
 
   SavedRecipesViewModel({required List<Recipe> likedRecipes})
-      : _likedRecipes = likedRecipes;
+    : _likedRecipes = likedRecipes;
 
   List<Recipe> get savedRecipes => List.unmodifiable(_likedRecipes);
 

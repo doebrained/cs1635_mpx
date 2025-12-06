@@ -22,12 +22,14 @@ class RecipeApiService {
     final uri = Uri.parse('${ApiConfig.mealDbBaseUrl}/search.php?s=$query');
 
     try {
-      final response = await _client.get(uri).timeout(
-        _httpTimeout,
-        onTimeout: () => throw TimeoutException(
-          'Recipe request timed out after ${_httpTimeout.inSeconds} seconds',
-        ),
-      );
+      final response = await _client
+          .get(uri)
+          .timeout(
+            _httpTimeout,
+            onTimeout: () => throw TimeoutException(
+              'Recipe request timed out after ${_httpTimeout.inSeconds} seconds',
+            ),
+          );
 
       if (response.statusCode != 200) {
         throw Exception('Failed to load recipes (${response.statusCode})');

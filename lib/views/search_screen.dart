@@ -4,6 +4,8 @@ import 'package:provider/provider.dart';
 import '../viewmodels/search_viewmodel.dart';
 import 'navigation_drawer.dart';
 import 'widgets/recipe_detail_sheet.dart';
+import 'widgets/fade_in_widget.dart';
+import 'widgets/staggered_list_item.dart';
 
 class SearchScreen extends StatelessWidget {
   const SearchScreen({Key? key}) : super(key: key);
@@ -34,27 +36,35 @@ class SearchScreen extends StatelessWidget {
                 ),
               )
             : searchVm.searchResults.isEmpty
-                ? const Center(
-                    child: Text(
-                      "No recipes found.",
-                      style: TextStyle(fontSize: 16),
-                    ),
-                  )
-                : ListView.builder(
-                    itemCount: searchVm.searchResults.length,
-                    itemBuilder: (context, index) {
-                      final recipe = searchVm.searchResults[index];
-                      return ListTile(
+            ? const Center(
+                child: Text(
+                  "No recipes found.",
+                  style: TextStyle(fontSize: 16),
+                ),
+              )
+            : FadeInWidget(
+                duration: const Duration(milliseconds: 400),
+                child: ListView.builder(
+                  itemCount: searchVm.searchResults.length,
+                  itemBuilder: (context, index) {
+                    final recipe = searchVm.searchResults[index];
+                    return StaggeredListItem(
+                      index: index,
+                      delay: Duration(milliseconds: 50 * index),
+                      child: ListTile(
                         title: Text(recipe.title),
-                        subtitle: Text(recipe.isCeliacSafe
-                            ? "Gluten-free"
-                            : "Contains gluten"),
+                        subtitle: Text(
+                          recipe.isCeliacSafe
+                              ? "Gluten-free"
+                              : "Contains gluten",
+                        ),
                         trailing: const Icon(Icons.arrow_forward_ios, size: 16),
-                        onTap: () =>
-                            showRecipeDetailSheet(context, recipe),
-                      );
-                    },
-                  ),
+                        onTap: () => showRecipeDetailSheet(context, recipe),
+                      ),
+                    );
+                  },
+                ),
+              ),
       ),
     );
   }

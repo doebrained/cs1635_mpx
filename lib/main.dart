@@ -12,15 +12,16 @@ void main() {
   runApp(
     MultiProvider(
       providers: [
-        ChangeNotifierProvider(
-          create: (_) => RecipeFilterViewModel(),
-        ),
+        ChangeNotifierProvider(create: (_) => RecipeFilterViewModel()),
         ChangeNotifierProxyProvider<RecipeFilterViewModel, SearchViewModel>(
           create: (_) => SearchViewModel(allRecipes: []),
           update: (_, filterVm, previousSearchVm) =>
               SearchViewModel(allRecipes: filterVm.allRecipes),
         ),
-        ChangeNotifierProxyProvider<RecipeFilterViewModel, SavedRecipesViewModel>(
+        ChangeNotifierProxyProvider<
+          RecipeFilterViewModel,
+          SavedRecipesViewModel
+        >(
           create: (_) => SavedRecipesViewModel(likedRecipes: []),
           update: (_, filterVm, previousSavedVm) =>
               SavedRecipesViewModel(likedRecipes: filterVm.likedRecipes),

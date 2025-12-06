@@ -7,6 +7,7 @@ import '../models/recipe.dart';
 import 'widgets/recipe_card.dart';
 import 'navigation_drawer.dart';
 import 'widgets/recipe_detail_sheet.dart';
+import 'widgets/fade_in_widget.dart';
 
 class RecipeFilterScreen extends StatefulWidget {
   const RecipeFilterScreen({super.key});
@@ -69,24 +70,34 @@ class _RecipeFilterScreenState extends State<RecipeFilterScreen> {
               child: vm.isLoading
                   ? const Center(child: CircularProgressIndicator())
                   : vm.errorMessage != null
-                  ? Center(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          const Icon(Icons.error_outline, size: 48, color: Colors.red),
-                          const SizedBox(height: 16),
-                          Text(
-                            vm.errorMessage!,
-                            textAlign: TextAlign.center,
-                            style: const TextStyle(fontSize: 16),
-                          ),
-                          const SizedBox(height: 24),
-                          ElevatedButton.icon(
-                            onPressed: () => vm.retryLoadRecipes(),
-                            icon: const Icon(Icons.refresh),
-                            label: const Text('Retry'),
-                          ),
-                        ],
+                  ? FadeInWidget(
+                      duration: const Duration(milliseconds: 400),
+                      child: Center(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            const Icon(
+                              Icons.error_outline,
+                              size: 48,
+                              color: Colors.red,
+                            ),
+                            const SizedBox(height: 16),
+                            Text(
+                              vm.errorMessage!,
+                              textAlign: TextAlign.center,
+                              style: const TextStyle(fontSize: 16),
+                            ),
+                            const SizedBox(height: 24),
+                            _ScaleButtonOnTap(
+                              onPressed: () => vm.retryLoadRecipes(),
+                              child: ElevatedButton.icon(
+                                onPressed: null,
+                                icon: const Icon(Icons.refresh),
+                                label: const Text('Retry'),
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
                     )
                   : filtered.isEmpty
@@ -96,7 +107,10 @@ class _RecipeFilterScreenState extends State<RecipeFilterScreen> {
                         textAlign: TextAlign.center,
                       ),
                     )
-                  : _SwipeDeck(recipes: filtered),
+                  : FadeInWidget(
+                      duration: const Duration(milliseconds: 600),
+                      child: _SwipeDeck(recipes: filtered),
+                    ),
             ),
           ],
         ),
@@ -105,8 +119,66 @@ class _RecipeFilterScreenState extends State<RecipeFilterScreen> {
   }
 }
 
+class _ScaleButtonOnTap extends StatefulWidget {
+  final VoidCallback onPressed;
+  final Widget child;
+  const _ScaleButtonOnTap({required this.onPressed, required this.child});
+
+  @override
+  State<_ScaleButtonOnTap> createState() => _ScaleButtonOnTapState();
+}
+
+class _ScaleButtonOnTapState extends State<_ScaleButtonOnTap>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+  late Animation<double> _scaleAnimation;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      duration: const Duration(milliseconds: 150),
+      vsync: this,
+    );
+    _scaleAnimation = Tween<double>(
+      begin: 1.0,
+      end: 0.95,
+    ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeInOut));
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  void _handleTapDown() async {
+    await _controller.forward();
+  }
+
+  void _handleTapUp() async {
+    await _controller.reverse();
+    widget.onPressed();
+  }
+
+  void _handleTapCancel() {
+    _controller.reverse();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTapDown: (_) => _handleTapDown(),
+      onTapUp: (_) => _handleTapUp(),
+      onTapCancel: _handleTapCancel,
+      child: ScaleTransition(scale: _scaleAnimation, child: widget.child),
+    );
+  }
+}
+
 class _SwipeDeck extends StatefulWidget {
   final List<Recipe> recipes;
+
   const _SwipeDeck({required this.recipes});
 
   @override
