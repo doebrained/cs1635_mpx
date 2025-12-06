@@ -38,13 +38,18 @@ class SavedRecipesScreen extends StatelessWidget {
                   return StaggeredListItem(
                     index: index,
                     delay: Duration(milliseconds: 50 * index),
-                    child: Padding(
-                      padding: const EdgeInsets.only(bottom: 16),
-                      child: SizedBox(
-                        height: 300,
-                        child: RecipeCard(
-                          recipe: recipe,
-                          onTap: () => showRecipeDetailSheet(context, recipe),
+                    child: Semantics(
+                      button: true,
+                      label: 'Saved recipe: ${recipe.title}',
+                      hint: 'Double tap to open details',
+                      child: Padding(
+                        padding: const EdgeInsets.only(bottom: 16),
+                        child: SizedBox(
+                          height: 300,
+                          child: RecipeCard(
+                            recipe: recipe,
+                            onTap: () => showRecipeDetailSheet(context, recipe),
+                          ),
                         ),
                       ),
                     ),

@@ -44,11 +44,14 @@ class _RecipeDetailSheet extends StatelessWidget {
                     ),
                   ),
                 ),
-                Text(
-                  recipe.title,
-                  style: const TextStyle(
-                    fontSize: 22,
-                    fontWeight: FontWeight.bold,
+                Semantics(
+                  header: true,
+                  child: Text(
+                    recipe.title,
+                    style: const TextStyle(
+                      fontSize: 22,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                 ),
                 const SizedBox(height: 12),
@@ -60,6 +63,7 @@ class _RecipeDetailSheet extends StatelessWidget {
                       height: 250,
                       width: double.infinity,
                       fit: BoxFit.cover,
+                      semanticLabel: '${recipe.title} image',
                       errorBuilder: (_, __, ___) => Container(
                         color: Colors.grey.shade200,
                         height: 250,
@@ -84,24 +88,36 @@ class _RecipeDetailSheet extends StatelessWidget {
                   ],
                 ),
                 const SizedBox(height: 16),
-                const Text(
-                  'Ingredients',
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                Semantics(
+                  header: true,
+                  child: Text(
+                    'Ingredients',
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                  ),
                 ),
                 const SizedBox(height: 8),
                 ...recipe.ingredients.map(
                   (ing) => Padding(
                     padding: const EdgeInsets.only(bottom: 6),
-                    child: Text('• $ing'),
+                    child: Semantics(
+                      label: ing,
+                      child: Text('• $ing'),
+                    ),
                   ),
                 ),
                 const SizedBox(height: 16),
-                const Text(
-                  'Instructions',
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                Semantics(
+                  header: true,
+                  child: Text(
+                    'Instructions',
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                  ),
                 ),
                 const SizedBox(height: 8),
-                Text(recipe.instructions),
+                Semantics(
+                  label: recipe.instructions,
+                  child: Text(recipe.instructions),
+                ),
                 const SizedBox(height: 24),
               ],
             ),

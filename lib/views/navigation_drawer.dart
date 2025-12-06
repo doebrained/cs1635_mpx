@@ -76,19 +76,25 @@ class AppNavigationDrawer extends StatelessWidget {
     String current,
   ) {
     final selected = route == current;
-    return ListTile(
-      leading: Icon(
-        icon,
-        color: selected ? Theme.of(context).colorScheme.primary : null,
-      ),
-      title: Text(
-        label,
-        style: TextStyle(
+    return Semantics(
+      button: true,
+      label: label,
+      selected: selected,
+      hint: 'Double tap to navigate to $label',
+      child: ListTile(
+        leading: Icon(
+          icon,
           color: selected ? Theme.of(context).colorScheme.primary : null,
         ),
+        title: Text(
+          label,
+          style: TextStyle(
+            color: selected ? Theme.of(context).colorScheme.primary : null,
+          ),
+        ),
+        selected: selected,
+        onTap: () => _navigate(context, route),
       ),
-      selected: selected,
-      onTap: () => _navigate(context, route),
     );
   }
 }

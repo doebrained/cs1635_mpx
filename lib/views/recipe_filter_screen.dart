@@ -46,15 +46,25 @@ class _RecipeFilterScreenState extends State<RecipeFilterScreen> {
 
             Column(
               children: [
-                SwitchListTile(
-                  title: const Text('Celiac-safe only (gluten-free)'),
-                  value: vm.celiacOnly,
-                  onChanged: vm.toggleCeliacOnly,
+                Semantics(
+                  container: true,
+                  label: 'Celiac-safe only',
+                  hint: 'Toggle to show gluten-free recipes only',
+                  child: SwitchListTile(
+                    title: const Text('Celiac-safe only (gluten-free)'),
+                    value: vm.celiacOnly,
+                    onChanged: vm.toggleCeliacOnly,
+                  ),
                 ),
-                SwitchListTile(
-                  title: const Text('Lactose-free only'),
-                  value: vm.lactoseOnly,
-                  onChanged: vm.toggleLactoseOnly,
+                Semantics(
+                  container: true,
+                  label: 'Lactose-free only',
+                  hint: 'Toggle to show lactose-free recipes only',
+                  child: SwitchListTile(
+                    title: const Text('Lactose-free only'),
+                    value: vm.lactoseOnly,
+                    onChanged: vm.toggleLactoseOnly,
+                  ),
                 ),
               ],
             ),
@@ -167,11 +177,16 @@ class _ScaleButtonOnTapState extends State<_ScaleButtonOnTap>
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTapDown: (_) => _handleTapDown(),
-      onTapUp: (_) => _handleTapUp(),
-      onTapCancel: _handleTapCancel,
-      child: ScaleTransition(scale: _scaleAnimation, child: widget.child),
+    return Semantics(
+      button: true,
+      label: 'Retry loading recipes',
+      hint: 'Retries fetching recipes from the server',
+      child: GestureDetector(
+        onTapDown: (_) => _handleTapDown(),
+        onTapUp: (_) => _handleTapUp(),
+        onTapCancel: _handleTapCancel,
+        child: ScaleTransition(scale: _scaleAnimation, child: widget.child),
+      ),
     );
   }
 }
@@ -241,26 +256,41 @@ class _SwipeDeckState extends State<_SwipeDeck> {
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            IconButton(
-              iconSize: 40,
-              icon: const Icon(Icons.close, color: Colors.redAccent),
-              onPressed: () => _controller.swipe(CardSwiperDirection.left),
+            Semantics(
+              button: true,
+              label: 'Reject recipe',
+              hint: 'Swipe left or press to reject the recipe',
+              child: IconButton(
+                iconSize: 40,
+                icon: const Icon(Icons.close, color: Colors.redAccent),
+                onPressed: () => _controller.swipe(CardSwiperDirection.left),
+              ),
             ),
             const SizedBox(width: 24),
-            IconButton(
-              iconSize: 36,
-              icon: const Icon(Icons.arrow_upward),
-              onPressed: () {
-                if (_currentIndex < widget.recipes.length) {
-                  showRecipeDetailSheet(context, widget.recipes[_currentIndex]);
-                }
-              },
+            Semantics(
+              button: true,
+              label: 'Show details',
+              hint: 'Open recipe details',
+              child: IconButton(
+                iconSize: 36,
+                icon: const Icon(Icons.arrow_upward),
+                onPressed: () {
+                  if (_currentIndex < widget.recipes.length) {
+                    showRecipeDetailSheet(context, widget.recipes[_currentIndex]);
+                  }
+                },
+              ),
             ),
             const SizedBox(width: 24),
-            IconButton(
-              iconSize: 40,
-              icon: const Icon(Icons.favorite, color: Colors.pinkAccent),
-              onPressed: () => _controller.swipe(CardSwiperDirection.right),
+            Semantics(
+              button: true,
+              label: 'Save recipe',
+              hint: 'Swipe right or press to save the recipe',
+              child: IconButton(
+                iconSize: 40,
+                icon: const Icon(Icons.favorite, color: Colors.pinkAccent),
+                onPressed: () => _controller.swipe(CardSwiperDirection.right),
+              ),
             ),
           ],
         ),

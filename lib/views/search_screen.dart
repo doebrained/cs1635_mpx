@@ -48,20 +48,27 @@ class SearchScreen extends StatelessWidget {
                   itemCount: searchVm.searchResults.length,
                   itemBuilder: (context, index) {
                     final recipe = searchVm.searchResults[index];
-                    return StaggeredListItem(
-                      index: index,
-                      delay: Duration(milliseconds: 50 * index),
-                      child: ListTile(
-                        title: Text(recipe.title),
-                        subtitle: Text(
-                          recipe.isCeliacSafe
-                              ? "Gluten-free"
-                              : "Contains gluten",
-                        ),
-                        trailing: const Icon(Icons.arrow_forward_ios, size: 16),
-                        onTap: () => showRecipeDetailSheet(context, recipe),
-                      ),
-                    );
+                        return StaggeredListItem(
+                          index: index,
+                          delay: Duration(milliseconds: 50 * index),
+                          child: Semantics(
+                            button: true,
+                            label: recipe.title,
+                            hint: recipe.isCeliacSafe
+                                ? 'Gluten-free. Double tap to view details.'
+                                : 'Contains gluten. Double tap to view details.',
+                            child: ListTile(
+                              title: Text(recipe.title),
+                              subtitle: Text(
+                                recipe.isCeliacSafe
+                                    ? "Gluten-free"
+                                    : "Contains gluten",
+                              ),
+                              trailing: const Icon(Icons.arrow_forward_ios, size: 16),
+                              onTap: () => showRecipeDetailSheet(context, recipe),
+                            ),
+                          ),
+                        );
                   },
                 ),
               ),
