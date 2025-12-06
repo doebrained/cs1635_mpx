@@ -234,9 +234,11 @@ class _SwipeDeckState extends State<_SwipeDeck> {
 
               if (direction == CardSwiperDirection.right) {
                 vm.like(recipe);
-              } else if (direction == CardSwiperDirection.left) {
-                vm.reject(recipe);
-              } else if (direction == CardSwiperDirection.top) {
+              } 
+              // else if (direction == CardSwiperDirection.left) {
+              //   vm.reject(recipe);
+              // } 
+              else if (direction == CardSwiperDirection.top) {
                 showRecipeDetailSheet(context, recipe);
                 _controller.undo(); // keep the same card on top
               }
