@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../theme/app_theme.dart';
 import '../../models/recipe.dart';
 import 'fade_in_widget.dart';
 
@@ -19,6 +20,7 @@ class _RecipeDetailSheet extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final textTheme = Theme.of(context).textTheme;
     return FadeInWidget(
       duration: const Duration(milliseconds: 400),
       child: DraggableScrollableSheet(
@@ -39,7 +41,7 @@ class _RecipeDetailSheet extends StatelessWidget {
                     height: 4,
                     margin: const EdgeInsets.only(bottom: 16),
                     decoration: BoxDecoration(
-                      color: Colors.grey.shade300,
+                      color: AccessibleColors.divider,
                       borderRadius: BorderRadius.circular(999),
                     ),
                   ),
@@ -48,8 +50,7 @@ class _RecipeDetailSheet extends StatelessWidget {
                   header: true,
                   child: Text(
                     recipe.title,
-                    style: const TextStyle(
-                      fontSize: 22,
+                    style: textTheme.headlineSmall?.copyWith(
                       fontWeight: FontWeight.bold,
                     ),
                   ),
@@ -65,26 +66,43 @@ class _RecipeDetailSheet extends StatelessWidget {
                       fit: BoxFit.cover,
                       semanticLabel: '${recipe.title} image',
                       errorBuilder: (_, __, ___) => Container(
-                        color: Colors.grey.shade200,
+                        color: AccessibleColors.surfaceLight,
                         height: 250,
-                        child: const Center(child: Icon(Icons.restaurant)),
+                        child: Center(
+                          child: Icon(
+                            Icons.restaurant,
+                            color: AccessibleColors.textTertiary,
+                          ),
+                        ),
                       ),
                     ),
                   )
                 else
                   Container(
                     height: 250,
-                    color: Colors.grey.shade200,
-                    child: const Center(child: Icon(Icons.restaurant)),
+                    color: AccessibleColors.surfaceLight,
+                    child: Center(
+                      child: Icon(
+                        Icons.restaurant,
+                        color: AccessibleColors.textTertiary,
+                      ),
+                    ),
                   ),
                 const SizedBox(height: 16),
                 Row(
                   children: [
-                    if (recipe.area.isNotEmpty) Text('Area: ${recipe.area}'),
+                    if (recipe.area.isNotEmpty)
+                      Text(
+                        'Area: ${recipe.area}',
+                        style: textTheme.bodyMedium,
+                      ),
                     if (recipe.area.isNotEmpty && recipe.category.isNotEmpty)
                       const SizedBox(width: 12),
                     if (recipe.category.isNotEmpty)
-                      Text('Category: ${recipe.category}'),
+                      Text(
+                        'Category: ${recipe.category}',
+                        style: textTheme.bodyMedium,
+                      ),
                   ],
                 ),
                 const SizedBox(height: 16),
@@ -92,7 +110,9 @@ class _RecipeDetailSheet extends StatelessWidget {
                   header: true,
                   child: Text(
                     'Ingredients',
-                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                    style: textTheme.titleLarge?.copyWith(
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                 ),
                 const SizedBox(height: 8),
@@ -101,7 +121,10 @@ class _RecipeDetailSheet extends StatelessWidget {
                     padding: const EdgeInsets.only(bottom: 6),
                     child: Semantics(
                       label: ing,
-                      child: Text('• $ing'),
+                      child: Text(
+                        '• $ing',
+                        style: textTheme.bodyMedium,
+                      ),
                     ),
                   ),
                 ),
@@ -110,13 +133,18 @@ class _RecipeDetailSheet extends StatelessWidget {
                   header: true,
                   child: Text(
                     'Instructions',
-                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                    style: textTheme.titleLarge?.copyWith(
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                 ),
                 const SizedBox(height: 8),
                 Semantics(
                   label: recipe.instructions,
-                  child: Text(recipe.instructions),
+                  child: Text(
+                    recipe.instructions,
+                    style: textTheme.bodyLarge,
+                  ),
                 ),
                 const SizedBox(height: 24),
               ],

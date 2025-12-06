@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../theme/app_theme.dart';
 import '../viewmodels/search_viewmodel.dart';
 import 'navigation_drawer.dart';
 import 'widgets/recipe_detail_sheet.dart';
@@ -29,17 +30,18 @@ class SearchScreen extends StatelessWidget {
       body: Padding(
         padding: const EdgeInsets.all(16),
         child: searchVm.query.isEmpty
-            ? const Center(
+            ? Center(
                 child: Text(
                   "Type in the search bar to find recipes.",
                   textAlign: TextAlign.center,
+                  style: Theme.of(context).textTheme.bodyLarge,
                 ),
               )
             : searchVm.searchResults.isEmpty
-            ? const Center(
+            ? Center(
                 child: Text(
                   "No recipes found.",
-                  style: TextStyle(fontSize: 16),
+                  style: Theme.of(context).textTheme.bodyLarge,
                 ),
               )
             : FadeInWidget(

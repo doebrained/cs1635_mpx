@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import 'theme/app_theme.dart';
 import 'viewmodels/recipe_filter_viewmodel.dart';
 import 'viewmodels/search_viewmodel.dart';
 import 'viewmodels/saved_recipes_viewmodel.dart';
@@ -37,13 +38,14 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Get device text scale factor (clamped to reasonable limits for accessibility)
+    final textScaleFactor =
+        MediaQuery.of(context).textScaleFactor.clamp(1.0, 1.3);
+
     return MaterialApp(
       title: 'Recipe Filter Demo',
       debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.teal),
-        useMaterial3: true,
-      ),
+      theme: AppTheme.buildTheme(textScaleFactor: textScaleFactor),
       initialRoute: '/',
       routes: {
         '/': (ctx) => const RecipeFilterScreen(),

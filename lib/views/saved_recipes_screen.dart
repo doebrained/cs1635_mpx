@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../theme/app_theme.dart';
 import '../viewmodels/saved_recipes_viewmodel.dart';
 import 'navigation_drawer.dart';
 import 'widgets/recipe_card.dart';
@@ -20,11 +21,11 @@ class SavedRecipesScreen extends StatelessWidget {
       drawer: const AppNavigationDrawer(currentRoute: '/saved'),
       appBar: AppBar(title: const Text("Saved Recipes")),
       body: saved.isEmpty
-          ? const Center(
+          ? Center(
               child: Text(
                 "You haven't saved any recipes yet.\nSwipe right to save!",
                 textAlign: TextAlign.center,
-                style: TextStyle(fontSize: 16),
+                style: Theme.of(context).textTheme.bodyLarge,
               ),
             )
           : FadeInWidget(

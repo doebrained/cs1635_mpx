@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../../theme/app_theme.dart';
+
 class TagChip extends StatelessWidget {
   final String label;
 
@@ -7,15 +9,23 @@ class TagChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final textTheme = Theme.of(context).textTheme;
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(999),
-        border: Border.all(color: Colors.grey.shade400),
+        border: Border.all(
+          color: AccessibleColors.primary,
+          width: 1.5,
+        ),
+        color: AccessibleColors.primaryLightest,
       ),
       child: Text(
         label,
-        style: TextStyle(fontSize: 11, color: Colors.grey.shade800),
+        style: textTheme.labelSmall?.copyWith(
+          color: AccessibleColors.primary,
+          fontWeight: FontWeight.w500,
+        ),
       ),
     );
   }

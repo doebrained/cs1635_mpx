@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../theme/app_theme.dart';
+
 class AppNavigationDrawer extends StatelessWidget {
   final String currentRoute;
   const AppNavigationDrawer({Key? key, required this.currentRoute})
@@ -25,11 +27,14 @@ class AppNavigationDrawer extends StatelessWidget {
               decoration: BoxDecoration(
                 color: Theme.of(context).colorScheme.primaryContainer,
               ),
-              child: const Align(
+              child: Align(
                 alignment: Alignment.bottomLeft,
                 child: Text(
                   'Menu',
-                  style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                  style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                    fontWeight: FontWeight.bold,
+                    color: AccessibleColors.textPrimary,
+                  ),
                 ),
               ),
             ),
@@ -59,7 +64,9 @@ class AppNavigationDrawer extends StatelessWidget {
               padding: const EdgeInsets.all(12.0),
               child: Text(
                 'v1.0',
-                style: TextStyle(color: Colors.grey.shade600),
+                style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                  color: AccessibleColors.textTertiary,
+                ),
               ),
             ),
           ],
@@ -88,8 +95,11 @@ class AppNavigationDrawer extends StatelessWidget {
         ),
         title: Text(
           label,
-          style: TextStyle(
-            color: selected ? Theme.of(context).colorScheme.primary : null,
+          style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+            color: selected
+                ? Theme.of(context).colorScheme.primary
+                : AccessibleColors.textPrimary,
+            fontWeight: selected ? FontWeight.w600 : FontWeight.normal,
           ),
         ),
         selected: selected,

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_card_swiper/flutter_card_swiper.dart';
 
+import '../theme/app_theme.dart';
 import '../viewmodels/recipe_filter_viewmodel.dart';
 import '../models/recipe.dart';
 import 'widgets/recipe_card.dart';
@@ -38,9 +39,11 @@ class _RecipeFilterScreenState extends State<RecipeFilterScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
+            Text(
               'Dietary Filters',
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+              style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                fontWeight: FontWeight.bold,
+              ),
             ),
             const SizedBox(height: 8),
 
@@ -72,7 +75,7 @@ class _RecipeFilterScreenState extends State<RecipeFilterScreen> {
             const SizedBox(height: 8),
             Text(
               'Matching recipes: ${filtered.length}',
-              style: const TextStyle(fontSize: 14),
+              style: Theme.of(context).textTheme.bodyMedium,
             ),
             const Divider(),
 
@@ -95,7 +98,7 @@ class _RecipeFilterScreenState extends State<RecipeFilterScreen> {
                             Text(
                               vm.errorMessage!,
                               textAlign: TextAlign.center,
-                              style: const TextStyle(fontSize: 16),
+                              style: Theme.of(context).textTheme.bodyLarge,
                             ),
                             const SizedBox(height: 24),
                             _ScaleButtonOnTap(
@@ -111,10 +114,11 @@ class _RecipeFilterScreenState extends State<RecipeFilterScreen> {
                       ),
                     )
                   : filtered.isEmpty
-                  ? const Center(
+                  ? Center(
                       child: Text(
                         'No recipes match your filters.\nTry changing them!',
                         textAlign: TextAlign.center,
+                        style: Theme.of(context).textTheme.bodyLarge,
                       ),
                     )
                   : FadeInWidget(
@@ -262,7 +266,7 @@ class _SwipeDeckState extends State<_SwipeDeck> {
               hint: 'Swipe left or press to reject the recipe',
               child: IconButton(
                 iconSize: 40,
-                icon: const Icon(Icons.close, color: Colors.redAccent),
+                icon: Icon(Icons.close, color: Theme.of(context).colorScheme.error),
                 onPressed: () => _controller.swipe(CardSwiperDirection.left),
               ),
             ),
@@ -273,7 +277,7 @@ class _SwipeDeckState extends State<_SwipeDeck> {
               hint: 'Open recipe details',
               child: IconButton(
                 iconSize: 36,
-                icon: const Icon(Icons.arrow_upward),
+                icon: Icon(Icons.arrow_upward, color: Theme.of(context).colorScheme.primary),
                 onPressed: () {
                   if (_currentIndex < widget.recipes.length) {
                     showRecipeDetailSheet(context, widget.recipes[_currentIndex]);
@@ -288,7 +292,7 @@ class _SwipeDeckState extends State<_SwipeDeck> {
               hint: 'Swipe right or press to save the recipe',
               child: IconButton(
                 iconSize: 40,
-                icon: const Icon(Icons.favorite, color: Colors.pinkAccent),
+                icon: Icon(Icons.favorite, color: Theme.of(context).colorScheme.secondary),
                 onPressed: () => _controller.swipe(CardSwiperDirection.right),
               ),
             ),
