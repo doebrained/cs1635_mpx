@@ -69,7 +69,26 @@ class _RecipeFilterScreenState extends State<RecipeFilterScreen> {
               child: vm.isLoading
                   ? const Center(child: CircularProgressIndicator())
                   : vm.errorMessage != null
-                  ? Center(child: Text("⚠️ Error: ${vm.errorMessage}"))
+                  ? Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          const Icon(Icons.error_outline, size: 48, color: Colors.red),
+                          const SizedBox(height: 16),
+                          Text(
+                            vm.errorMessage!,
+                            textAlign: TextAlign.center,
+                            style: const TextStyle(fontSize: 16),
+                          ),
+                          const SizedBox(height: 24),
+                          ElevatedButton.icon(
+                            onPressed: () => vm.retryLoadRecipes(),
+                            icon: const Icon(Icons.refresh),
+                            label: const Text('Retry'),
+                          ),
+                        ],
+                      ),
+                    )
                   : filtered.isEmpty
                   ? const Center(
                       child: Text(
