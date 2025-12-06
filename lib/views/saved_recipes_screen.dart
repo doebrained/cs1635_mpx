@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import '../theme/app_theme.dart';
 import '../viewmodels/saved_recipes_viewmodel.dart';
 import 'navigation_drawer.dart';
 import 'widgets/recipe_card.dart';
 import 'widgets/recipe_detail_sheet.dart';
 import 'widgets/fade_in_widget.dart';
 import 'widgets/staggered_list_item.dart';
+import 'widgets/snackstack_header.dart'; // ⭐ NEW IMPORT
 
 class SavedRecipesScreen extends StatelessWidget {
   const SavedRecipesScreen({super.key});
@@ -19,7 +19,13 @@ class SavedRecipesScreen extends StatelessWidget {
 
     return Scaffold(
       drawer: const AppNavigationDrawer(currentRoute: '/saved'),
-      appBar: AppBar(title: const Text("Saved Recipes")),
+
+      // ⭐ USE SNACKSTACK LOGO HEADER
+      appBar: AppBar(
+        centerTitle: true,
+        title: const SnackStackHeader(),
+      ),
+
       body: saved.isEmpty
           ? Center(
               child: Text(
@@ -49,7 +55,8 @@ class SavedRecipesScreen extends StatelessWidget {
                           height: 300,
                           child: RecipeCard(
                             recipe: recipe,
-                            onTap: () => showRecipeDetailSheet(context, recipe),
+                            onTap: () =>
+                                showRecipeDetailSheet(context, recipe),
                           ),
                         ),
                       ),

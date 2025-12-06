@@ -2,13 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_card_swiper/flutter_card_swiper.dart';
 
-import '../theme/app_theme.dart';
-import '../viewmodels/recipe_filter_viewmodel.dart';
+import '../theme/app_theme.dart';import '../viewmodels/recipe_filter_viewmodel.dart';
 import '../models/recipe.dart';
 import 'widgets/recipe_card.dart';
 import 'navigation_drawer.dart';
 import 'widgets/recipe_detail_sheet.dart';
 import 'widgets/fade_in_widget.dart';
+import 'widgets/snackstack_header.dart'; // ⭐ NEW IMPORT
 
 class RecipeFilterScreen extends StatefulWidget {
   const RecipeFilterScreen({super.key});
@@ -33,7 +33,13 @@ class _RecipeFilterScreenState extends State<RecipeFilterScreen> {
 
     return Scaffold(
       drawer: const AppNavigationDrawer(currentRoute: '/'),
-      appBar: AppBar(title: const Text('Swipe Recipes')),
+
+      // ⭐ UPDATED HEADER
+      appBar: AppBar(
+        centerTitle: true,
+        title: const SnackStackHeader(),
+      ),
+
       body: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
@@ -73,58 +79,57 @@ class _RecipeFilterScreenState extends State<RecipeFilterScreen> {
             ),
 
             const SizedBox(height: 8),
+
             Text(
               'Matching recipes: ${filtered.length}',
               style: Theme.of(context).textTheme.bodyMedium,
             ),
+
             const Divider(),
 
             Expanded(
               child: vm.isLoading
                   ? const Center(child: CircularProgressIndicator())
                   : vm.errorMessage != null
-                  ? FadeInWidget(
-                      duration: const Duration(milliseconds: 400),
-                      child: Center(
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            const Icon(
-                              Icons.error_outline,
-                              size: 48,
-                              color: Colors.red,
+                      ? FadeInWidget(
+                          duration: const Duration(milliseconds: 400),
+                          child: Center(
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                const Icon(Icons.error_outline,
+                                    size: 48, color: Colors.red),
+                                const SizedBox(height: 16),
+                                Text(
+                                  vm.errorMessage!,
+                                  textAlign: TextAlign.center,
+                                  style: Theme.of(context).textTheme.bodyLarge,
+                                ),
+                                const SizedBox(height: 24),
+                                _ScaleButtonOnTap(
+                                  onPressed: () => vm.retryLoadRecipes(),
+                                  child: ElevatedButton.icon(
+                                    onPressed: null,
+                                    icon: const Icon(Icons.refresh),
+                                    label: const Text('Retry'),
+                                  ),
+                                ),
+                              ],
                             ),
-                            const SizedBox(height: 16),
-                            Text(
-                              vm.errorMessage!,
-                              textAlign: TextAlign.center,
-                              style: Theme.of(context).textTheme.bodyLarge,
+                          ),
+                        )
+                      : filtered.isEmpty
+                          ? Center(
+                              child: Text(
+                                'No recipes match your filters.\nTry changing them!',
+                                textAlign: TextAlign.center,
+                                style: Theme.of(context).textTheme.bodyLarge,
+                              ),
+                            )
+                          : FadeInWidget(
+                              duration: const Duration(milliseconds: 600),
+                              child: _SwipeDeck(recipes: filtered),
                             ),
-                            const SizedBox(height: 24),
-                            // _ScaleButtonOnTap(
-                            //   onPressed: () => vm.retryLoadRecipes(),
-                            //   child: ElevatedButton.icon(
-                            //     onPressed: null,
-                            //     icon: const Icon(Icons.refresh),
-                            //     label: const Text('Retry'),
-                            //   ),
-                            // ),
-                          ],
-                        ),
-                      ),
-                    )
-                  : filtered.isEmpty
-                  ? Center(
-                      child: Text(
-                        'No recipes match your filters.\nTry changing them!',
-                        textAlign: TextAlign.center,
-                        style: Theme.of(context).textTheme.bodyLarge,
-                      ),
-                    )
-                  : FadeInWidget(
-                      duration: const Duration(milliseconds: 600),
-                      child: _SwipeDeck(recipes: filtered),
-                    ),
             ),
           ],
         ),
@@ -154,10 +159,9 @@ class _ScaleButtonOnTapState extends State<_ScaleButtonOnTap>
       duration: const Duration(milliseconds: 150),
       vsync: this,
     );
-    _scaleAnimation = Tween<double>(
-      begin: 1.0,
-      end: 0.95,
-    ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeInOut));
+    _scaleAnimation = Tween<double>(begin: 1.0, end: 0.95).animate(
+      CurvedAnimation(parent: _controller, curve: Curves.easeInOut),
+    );
   }
 
   @override
@@ -166,18 +170,13 @@ class _ScaleButtonOnTapState extends State<_ScaleButtonOnTap>
     super.dispose();
   }
 
-  void _handleTapDown() async {
-    await _controller.forward();
-  }
-
+  void _handleTapDown() async => await _controller.forward();
   void _handleTapUp() async {
     await _controller.reverse();
     widget.onPressed();
   }
 
-  void _handleTapCancel() {
-    _controller.reverse();
-  }
+  void _handleTapCancel() => _controller.reverse();
 
   @override
   Widget build(BuildContext context) {
@@ -227,28 +226,22 @@ class _SwipeDeckState extends State<_SwipeDeck> {
             cardBuilder: (context, index, _, __) {
               return RecipeCard(recipe: widget.recipes[index]);
             },
-
             onSwipe: (previousIndex, currentIndex, direction) {
-              final swipedIndex = previousIndex;
-              final recipe = widget.recipes[swipedIndex];
+              final recipe = widget.recipes[previousIndex];
 
               if (direction == CardSwiperDirection.right) {
                 vm.like(recipe);
-              } 
-              // else if (direction == CardSwiperDirection.left) {
-              //   vm.reject(recipe);
-              // } 
-              else if (direction == CardSwiperDirection.top) {
+              } else if (direction == CardSwiperDirection.left) {
+                vm.reject(recipe);
+              } else if (direction == CardSwiperDirection.top) {
                 showRecipeDetailSheet(context, recipe);
-                _controller.undo(); // keep the same card on top
+                _controller.undo();
               }
 
               setState(() {
                 if (direction == CardSwiperDirection.top) {
-                  // card stays the same
-                  _currentIndex = swipedIndex;
+                  _currentIndex = previousIndex;
                 } else {
-                  // moved to next card
                   _currentIndex = currentIndex ?? widget.recipes.length;
                 }
               });
@@ -257,6 +250,7 @@ class _SwipeDeckState extends State<_SwipeDeck> {
             },
           ),
         ),
+
         const SizedBox(height: 12),
 
         Row(
@@ -265,24 +259,26 @@ class _SwipeDeckState extends State<_SwipeDeck> {
             Semantics(
               button: true,
               label: 'Reject recipe',
-              hint: 'Swipe left or press to reject the recipe',
               child: IconButton(
                 iconSize: 40,
-                icon: Icon(Icons.close, color: Theme.of(context).colorScheme.error),
-                onPressed: () => _controller.swipe(CardSwiperDirection.left),
+                icon: Icon(Icons.close,
+                    color: Theme.of(context).colorScheme.error),
+                onPressed: () =>
+                    _controller.swipe(CardSwiperDirection.left),
               ),
             ),
             const SizedBox(width: 24),
             Semantics(
               button: true,
               label: 'Show details',
-              hint: 'Open recipe details',
               child: IconButton(
                 iconSize: 36,
-                icon: Icon(Icons.arrow_upward, color: Theme.of(context).colorScheme.primary),
+                icon: Icon(Icons.arrow_upward,
+                    color: Theme.of(context).colorScheme.primary),
                 onPressed: () {
                   if (_currentIndex < widget.recipes.length) {
-                    showRecipeDetailSheet(context, widget.recipes[_currentIndex]);
+                    showRecipeDetailSheet(
+                        context, widget.recipes[_currentIndex]);
                   }
                 },
               ),
@@ -291,11 +287,12 @@ class _SwipeDeckState extends State<_SwipeDeck> {
             Semantics(
               button: true,
               label: 'Save recipe',
-              hint: 'Swipe right or press to save the recipe',
               child: IconButton(
                 iconSize: 40,
-                icon: Icon(Icons.favorite, color: Theme.of(context).colorScheme.secondary),
-                onPressed: () => _controller.swipe(CardSwiperDirection.right),
+                icon: Icon(Icons.favorite,
+                    color: Theme.of(context).colorScheme.secondary),
+                onPressed: () =>
+                    _controller.swipe(CardSwiperDirection.right),
               ),
             ),
           ],
@@ -304,5 +301,3 @@ class _SwipeDeckState extends State<_SwipeDeck> {
     );
   }
 }
-
-// Use shared `showRecipeDetailSheet` from widgets/recipe_detail_sheet.dart
