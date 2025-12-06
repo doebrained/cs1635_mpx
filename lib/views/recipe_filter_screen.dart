@@ -101,14 +101,14 @@ class _RecipeFilterScreenState extends State<RecipeFilterScreen> {
                               style: Theme.of(context).textTheme.bodyLarge,
                             ),
                             const SizedBox(height: 24),
-                            _ScaleButtonOnTap(
-                              onPressed: () => vm.retryLoadRecipes(),
-                              child: ElevatedButton.icon(
-                                onPressed: null,
-                                icon: const Icon(Icons.refresh),
-                                label: const Text('Retry'),
-                              ),
-                            ),
+                            // _ScaleButtonOnTap(
+                            //   onPressed: () => vm.retryLoadRecipes(),
+                            //   child: ElevatedButton.icon(
+                            //     onPressed: null,
+                            //     icon: const Icon(Icons.refresh),
+                            //     label: const Text('Retry'),
+                            //   ),
+                            // ),
                           ],
                         ),
                       ),
