@@ -3,7 +3,7 @@
 </p>
 
 # SnackStack — Intelligent Recipe Discovery  
-### CS1635 / CS2035 — Machine Problem X  
+### CS1635 — Machine Problem X  
 **Fall 2025 — Dr. Jacob Biehl**
 
 ---
