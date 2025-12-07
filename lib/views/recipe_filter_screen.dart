@@ -187,6 +187,27 @@ class _SwipeDeckState extends State<_SwipeDeck> {
               return RecipeCard(recipe: widget.recipes[index]);
             },
 
+            onEnd: () {
+              // Example behavior: show your no_results widget or reset
+              showDialog(
+                context: context,
+                builder: (_) => AlertDialog(
+                  title: const Text("No More Recipes"),
+                  content: const Text("Go to Saved Recipes to see your likes!"),
+                  actions: [
+                    TextButton(
+                      onPressed: () {
+                        Navigator.pop(context);
+                        // If you have resetFilters available
+                        // context.read<RecipeFilterViewModel>().resetFilters();
+                      },
+                      child: const Text("OK"),
+                    ),
+                  ],
+                ),
+              );
+            },
+
             onSwipe: (prev, next, dir) {
               final recipe = widget.recipes[prev];
 
