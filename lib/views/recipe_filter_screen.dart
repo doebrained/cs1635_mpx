@@ -236,15 +236,13 @@ class _SwipeDeckState extends State<_SwipeDeck> {
                 vm.reject(recipe);
               } else if (direction == CardSwiperDirection.top) {
                 showRecipeDetailSheet(context, recipe);
-                _controller.undo();
+               return false;
               }
 
               setState(() {
                 if (direction == CardSwiperDirection.top) {
-                  _currentIndex = previousIndex;
-                } else {
-                  _currentIndex = currentIndex ?? widget.recipes.length;
-                }
+                  _currentIndex = currentIndex ?? previousIndex;
+                } 
               });
 
               return true;
