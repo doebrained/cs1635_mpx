@@ -194,7 +194,6 @@ class _SwipeDeckState extends State<_SwipeDeck> {
             ),
 
             cardBuilder: (context, index, _, __) {
-              _currentIndex = index;
               return RecipeCard(recipe: widget.recipes[index]);
             },
 
@@ -209,7 +208,6 @@ class _SwipeDeckState extends State<_SwipeDeck> {
               // UP = SHOW DETAILS (and undo swipe)
               if (dir == CardSwiperDirection.top) {
                 showRecipeDetailSheet(context, recipe);
-                _controller.undo();
                 return false; // keep card in place
               }
 
