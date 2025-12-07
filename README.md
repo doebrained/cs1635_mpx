@@ -90,5 +90,8 @@ GitHub cannot embed `.mov`, but you can **click to download/view**:
                  |  • Search Screen       |
                  |  • Recipe Detail Sheet |
                  |  • Saved Recipes Page  |
-                 |  •  Shared Widgets (cards, chips, animations, drawer, etc.)  |
+                 |  • Shared Widgets      |
+                 |   (cards, tags,        |
+                 |     animations,        |
+                 |   drawer, etc.)        |
                  +------------------------+
