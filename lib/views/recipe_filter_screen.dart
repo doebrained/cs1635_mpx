@@ -97,16 +97,6 @@ class _RecipeFilterScreenState extends State<RecipeFilterScreen> {
                     onChanged: vm.toggleVegan,
                   ),
                   SwitchListTile(
-                    title: const Text('Nut-free only'),
-                    value: vm.nutFreeOnly,
-                    onChanged: vm.toggleNutFree,
-                  ),
-                  SwitchListTile(
-                    title: const Text('Halal only'),
-                    value: vm.halalOnly,
-                    onChanged: vm.toggleHalal,
-                  ),
-                  SwitchListTile(
                     title: const Text('Kosher only'),
                     value: vm.kosherOnly,
                     onChanged: vm.toggleKosher,
