@@ -46,6 +46,11 @@ class RecipeCard extends StatelessWidget {
                       children: [
                         if (recipe.isCeliacSafe) _TagChip(label: 'Gluten-free'),
                         if (recipe.isLactoseFree) _TagChip(label: 'Dairy-free'),
+                        if (recipe.isVegetarian) _TagChip(label: 'Vegetarian'),
+                        if (recipe.isVegan) _TagChip(label: 'Vegan'),
+                        if (recipe.isNutFree) _TagChip(label: 'Nut-free'),
+                        if (recipe.isKosher) _TagChip(label: 'Kosher'),
+                        if (recipe.isHalal) _TagChip(label: 'Halal'),
                       ],
                     ),
                   ],
