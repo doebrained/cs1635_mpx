@@ -15,12 +15,16 @@ class RecipeFilterViewModel extends ChangeNotifier {
   bool _lactoseOnly = false;
   bool _vegetarianOnly = false;
   bool _veganOnly = false;
+  bool _nutFreeOnly = false;
+  bool _halalOnly = false;
   bool _kosherOnly = false;
 
   bool get celiacOnly => _celiacOnly;
   bool get lactoseOnly => _lactoseOnly;
   bool get vegetarianOnly => _vegetarianOnly;
   bool get veganOnly => _veganOnly;
+  bool get nutFreeOnly => _nutFreeOnly;
+  bool get halalOnly => _halalOnly;
   bool get kosherOnly => _kosherOnly;
 
   // ---------------------------
@@ -44,6 +48,8 @@ class RecipeFilterViewModel extends ChangeNotifier {
       if (_lactoseOnly && !r.isLactoseFree) return false;
       if (_vegetarianOnly && !r.isVegetarian) return false;
       if (_veganOnly && !r.isVegan) return false;
+      if (_nutFreeOnly && !r.isNutFree) return false;
+      if (_halalOnly && !r.isHalal) return false;
       if (_kosherOnly && !r.isKosher) return false;
       return true;
     }).toList();
@@ -58,6 +64,8 @@ class RecipeFilterViewModel extends ChangeNotifier {
   void toggleLactoseOnly(bool v) { _lactoseOnly = v; notifyListeners(); }
   void toggleVegetarian(bool v) { _vegetarianOnly = v; notifyListeners(); }
   void toggleVegan(bool v) { _veganOnly = v; notifyListeners(); }
+  void toggleNutFree(bool v) { _nutFreeOnly = v; notifyListeners(); }
+  void toggleHalal(bool v) { _halalOnly = v; notifyListeners(); }
   void toggleKosher(bool v) { _kosherOnly = v; notifyListeners(); }
 
   // ---------------------------

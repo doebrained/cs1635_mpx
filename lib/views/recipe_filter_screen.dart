@@ -18,7 +18,7 @@ class RecipeFilterScreen extends StatefulWidget {
 }
 
 class _RecipeFilterScreenState extends State<RecipeFilterScreen> {
-  bool _expanded = false; // NEW — controls collapse
+  bool _expanded = false;
 
   @override
   void initState() {
@@ -42,9 +42,6 @@ class _RecipeFilterScreenState extends State<RecipeFilterScreen> {
 
       body: Column(
         children: [
-          // ---------------------------------------------------
-          // COLLAPSIBLE FILTER HEADER
-          // ---------------------------------------------------
           GestureDetector(
             onTap: () => setState(() => _expanded = !_expanded),
             child: Container(
@@ -66,12 +63,9 @@ class _RecipeFilterScreenState extends State<RecipeFilterScreen> {
             ),
           ),
 
-          // ---------------------------------------------------
-          // COLLAPSIBLE FILTER CONTENT
-          // ---------------------------------------------------
           AnimatedContainer(
             duration: const Duration(milliseconds: 250),
-            height: _expanded ? 280 : 0, // COMPRESSED height when collapsed
+            height: _expanded ? 280 : 0,
             padding: const EdgeInsets.symmetric(horizontal: 16),
             child: SingleChildScrollView(
               child: Column(
@@ -97,6 +91,16 @@ class _RecipeFilterScreenState extends State<RecipeFilterScreen> {
                     onChanged: vm.toggleVegan,
                   ),
                   SwitchListTile(
+                    title: const Text('Nut-free only'),
+                    value: vm.nutFreeOnly,
+                    onChanged: vm.toggleNutFree,
+                  ),
+                  SwitchListTile(
+                    title: const Text('Halal only'),
+                    value: vm.halalOnly,
+                    onChanged: vm.toggleHalal,
+                  ),
+                  SwitchListTile(
                     title: const Text('Kosher only'),
                     value: vm.kosherOnly,
                     onChanged: vm.toggleKosher,
@@ -106,9 +110,6 @@ class _RecipeFilterScreenState extends State<RecipeFilterScreen> {
             ),
           ),
 
-          // ---------------------------------------------------
-          // MATCHING COUNT
-          // ---------------------------------------------------
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
             child: Align(
@@ -122,16 +123,11 @@ class _RecipeFilterScreenState extends State<RecipeFilterScreen> {
 
           const Divider(height: 1),
 
-          // ---------------------------------------------------
-          // MAIN SWIPE DECK AREA
-          // ---------------------------------------------------
           Expanded(
             child: vm.isLoading
                 ? const Center(child: CircularProgressIndicator())
-
                 : vm.errorMessage != null
                     ? Center(child: Text(vm.errorMessage!))
-
                     : filtered.isEmpty
                         ? Center(
                             child: Text(
@@ -139,7 +135,6 @@ class _RecipeFilterScreenState extends State<RecipeFilterScreen> {
                               style: Theme.of(context).textTheme.bodyLarge,
                             ),
                           )
-
                         : FadeInWidget(
                             duration: const Duration(milliseconds: 400),
                             child: _SwipeDeck(recipes: filtered),
@@ -150,6 +145,10 @@ class _RecipeFilterScreenState extends State<RecipeFilterScreen> {
     );
   }
 }
+
+// -------------------------------------------------------
+// SWIPE DECK
+// -------------------------------------------------------
 
 // -------------------------------------------------------
 // SWIPE DECK COMPONENT
@@ -177,43 +176,21 @@ class _SwipeDeckState extends State<_SwipeDeck> {
             controller: _controller,
             cardsCount: widget.recipes.length,
             isLoop: false,
-            allowedSwipeDirection: const AllowedSwipeDirection.only(
-              left: true,
-              right: true,
-              up: true,
-            ),
-
+            allowedSwipeDirection:
+                const AllowedSwipeDirection.only(left: true, right: true, up: true),
             cardBuilder: (context, index, _, __) {
+              _currentIndex = index;
               return RecipeCard(recipe: widget.recipes[index]);
             },
-
-            onEnd: () {
-              // Example behavior: show your no_results widget or reset
-              showDialog(
-                context: context,
-                builder: (_) => AlertDialog(
-                  title: const Text("No More Recipes"),
-                  content: const Text("Go to Saved Recipes to see your likes!"),
-                  actions: [
-                    TextButton(
-                      onPressed: () {
-                        Navigator.pop(context);
-                        // If you have resetFilters available
-                        // context.read<RecipeFilterViewModel>().resetFilters();
-                      },
-                      child: const Text("OK"),
-                    ),
-                  ],
-                ),
-              );
-            },
-
             onSwipe: (prev, next, dir) {
               final recipe = widget.recipes[prev];
 
-              // RIGHT = LIKE
-              if (dir == CardSwiperDirection.right) {
-                vm.like(recipe);
+              if (dir == CardSwiperDirection.right) vm.like(recipe);
+
+              if (dir == CardSwiperDirection.top) {
+                showRecipeDetailSheet(context, recipe);
+                _controller.undo();
+                return false;
               }
 
               // UP = SHOW DETAILS (and undo swipe)
@@ -244,8 +221,8 @@ class _SwipeDeckState extends State<_SwipeDeck> {
           children: [
             IconButton(
               iconSize: 40,
-              icon:
-                  Icon(Icons.close, color: Theme.of(context).colorScheme.error),
+              icon: Icon(Icons.close,
+                  color: Theme.of(context).colorScheme.error),
               onPressed: () => _controller.swipe(CardSwiperDirection.left),
             ),
             const SizedBox(width: 24),
@@ -254,8 +231,7 @@ class _SwipeDeckState extends State<_SwipeDeck> {
               icon: Icon(Icons.arrow_upward,
                   color: Theme.of(context).colorScheme.primary),
               onPressed: () {
-                showRecipeDetailSheet(
-                    context, widget.recipes[_currentIndex]);
+                showRecipeDetailSheet(context, widget.recipes[_currentIndex]);
               },
             ),
             const SizedBox(width: 24),
@@ -263,8 +239,7 @@ class _SwipeDeckState extends State<_SwipeDeck> {
               iconSize: 40,
               icon: Icon(Icons.favorite,
                   color: Theme.of(context).colorScheme.secondary),
-              onPressed: () =>
-                  _controller.swipe(CardSwiperDirection.right),
+              onPressed: () => _controller.swipe(CardSwiperDirection.right),
             ),
           ],
         ),
