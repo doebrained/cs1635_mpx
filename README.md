@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="assets/Logo.png" alt="SnackStack Logo" width="180"/>
+  <img src="lib/assets/Logo.png" alt="SnackStack Logo" width="180"/>
 </p>
 
 # 🍽️ SnackStack — Intelligent Recipe Discovery  
@@ -52,14 +52,14 @@ Used for:
 
 | Home / Swipe | Saved Recipes | Search Page |
 |--------------|---------------|-------------|
-| <img src="assets/MainPage.png" width="260"/> | <img src="assets/SavedRecipes.png" width="260"/> | <img src="assets/SearchRecipes.png" width="260"/> |
+| <img src="lib/assets/MainPage.png" width="260"/> | <img src="lib/assets/SavedRecipes.png" width="260"/> | <img src="lib/assets/SearchRecipes.png" width="260"/> |
 
 ---
 
 ### 🎥 **Demo Video**
 GitHub cannot embed `.mov`, but you can **click to download/view**:
 
-👉 [Screen Recording](assets/Screen%20Recording.mov)
+👉 [Screen Recording](lib/assets/Screen%20Recording.mov)
 
 ---
 
