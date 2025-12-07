@@ -67,11 +67,14 @@ GitHub cannot embed `.mov`, but you can **click to download/view**:
 
                  +------------------------+
                  |        Models          |
-                 |  • Recipe              |
-                 |  • Nutrition           |
-                 |  • Ingredient          |
+                 |  • Recipe              |          |
                  +-----------▲------------+
                              │
+                             │
+                 +-----------┴------------+
+                 |        Services        |
+                 |  • RecipeApiService    |
+                 +-----------▲------------+
                              │
                  +-----------┴------------+
                  |       ViewModels       |
@@ -87,4 +90,5 @@ GitHub cannot embed `.mov`, but you can **click to download/view**:
                  |  • Search Screen       |
                  |  • Recipe Detail Sheet |
                  |  • Saved Recipes Page  |
+                 |  •  Shared Widgets (cards, chips, animations, drawer, etc.)  |
                  +------------------------+
