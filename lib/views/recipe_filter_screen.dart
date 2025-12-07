@@ -2,14 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_card_swiper/flutter_card_swiper.dart';
 
-import '../theme/app_theme.dart';
 import '../viewmodels/recipe_filter_viewmodel.dart';
 import '../models/recipe.dart';
 import 'widgets/recipe_card.dart';
 import 'navigation_drawer.dart';
 import 'widgets/recipe_detail_sheet.dart';
 import 'widgets/fade_in_widget.dart';
-import 'widgets/snackstack_header.dart'; // ⭐ NEW IMPORT
+import 'widgets/snackstack_header.dart';
 
 class RecipeFilterScreen extends StatefulWidget {
   const RecipeFilterScreen({super.key});
@@ -19,6 +18,8 @@ class RecipeFilterScreen extends StatefulWidget {
 }
 
 class _RecipeFilterScreenState extends State<RecipeFilterScreen> {
+  bool _expanded = false; // NEW — controls collapse
+
   @override
   void initState() {
     super.initState();
@@ -34,170 +35,137 @@ class _RecipeFilterScreenState extends State<RecipeFilterScreen> {
 
     return Scaffold(
       drawer: const AppNavigationDrawer(currentRoute: '/'),
-
-      // ⭐ UPDATED HEADER
       appBar: AppBar(
         centerTitle: true,
         title: const SnackStackHeader(),
       ),
 
-      body: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'Dietary Filters',
-              style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                fontWeight: FontWeight.bold,
+      body: Column(
+        children: [
+          // ---------------------------------------------------
+          // COLLAPSIBLE FILTER HEADER
+          // ---------------------------------------------------
+          GestureDetector(
+            onTap: () => setState(() => _expanded = !_expanded),
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+              color: Colors.grey.shade100,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    "Dietary Filters",
+                    style: Theme.of(context)
+                        .textTheme
+                        .headlineSmall
+                        ?.copyWith(fontWeight: FontWeight.bold),
+                  ),
+                  Icon(_expanded ? Icons.expand_less : Icons.expand_more)
+                ],
               ),
             ),
-            const SizedBox(height: 8),
+          ),
 
-            Column(
-              children: [
-                Semantics(
-                  container: true,
-                  label: 'Celiac-safe only',
-                  hint: 'Toggle to show gluten-free recipes only',
-                  child: SwitchListTile(
+          // ---------------------------------------------------
+          // COLLAPSIBLE FILTER CONTENT
+          // ---------------------------------------------------
+          AnimatedContainer(
+            duration: const Duration(milliseconds: 250),
+            height: _expanded ? 280 : 0, // COMPRESSED height when collapsed
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            child: SingleChildScrollView(
+              child: Column(
+                children: [
+                  SwitchListTile(
                     title: const Text('Celiac-safe only (gluten-free)'),
                     value: vm.celiacOnly,
                     onChanged: vm.toggleCeliacOnly,
                   ),
-                ),
-                Semantics(
-                  container: true,
-                  label: 'Lactose-free only',
-                  hint: 'Toggle to show lactose-free recipes only',
-                  child: SwitchListTile(
+                  SwitchListTile(
                     title: const Text('Lactose-free only'),
                     value: vm.lactoseOnly,
                     onChanged: vm.toggleLactoseOnly,
                   ),
-                ),
-              ],
+                  SwitchListTile(
+                    title: const Text('Vegetarian only'),
+                    value: vm.vegetarianOnly,
+                    onChanged: vm.toggleVegetarian,
+                  ),
+                  SwitchListTile(
+                    title: const Text('Vegan only'),
+                    value: vm.veganOnly,
+                    onChanged: vm.toggleVegan,
+                  ),
+                  SwitchListTile(
+                    title: const Text('Nut-free only'),
+                    value: vm.nutFreeOnly,
+                    onChanged: vm.toggleNutFree,
+                  ),
+                  SwitchListTile(
+                    title: const Text('Halal only'),
+                    value: vm.halalOnly,
+                    onChanged: vm.toggleHalal,
+                  ),
+                  SwitchListTile(
+                    title: const Text('Kosher only'),
+                    value: vm.kosherOnly,
+                    onChanged: vm.toggleKosher,
+                  ),
+                ],
+              ),
             ),
+          ),
 
-            const SizedBox(height: 8),
-
-            Text(
-              'Matching recipes: ${filtered.length}',
-              style: Theme.of(context).textTheme.bodyMedium,
+          // ---------------------------------------------------
+          // MATCHING COUNT
+          // ---------------------------------------------------
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+            child: Align(
+              alignment: Alignment.centerLeft,
+              child: Text(
+                "Matching recipes: ${filtered.length}",
+                style: Theme.of(context).textTheme.bodyMedium,
+              ),
             ),
+          ),
 
-            const Divider(),
+          const Divider(height: 1),
 
-            Expanded(
-              child: vm.isLoading
-                  ? const Center(child: CircularProgressIndicator())
-                  : vm.errorMessage != null
-                      ? FadeInWidget(
-                          duration: const Duration(milliseconds: 400),
-                          child: Center(
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                const Icon(Icons.error_outline,
-                                    size: 48, color: Colors.red),
-                                const SizedBox(height: 16),
-                                Text(
-                                  vm.errorMessage!,
-                                  textAlign: TextAlign.center,
-                                  style: Theme.of(context).textTheme.bodyLarge,
-                                ),
-                                const SizedBox(height: 24),
-                                _ScaleButtonOnTap(
-                                  onPressed: () => vm.retryLoadRecipes(),
-                                  child: ElevatedButton.icon(
-                                    onPressed: null,
-                                    icon: const Icon(Icons.refresh),
-                                    label: const Text('Retry'),
-                                  ),
-                                ),
-                              ],
+          // ---------------------------------------------------
+          // MAIN SWIPE DECK AREA
+          // ---------------------------------------------------
+          Expanded(
+            child: vm.isLoading
+                ? const Center(child: CircularProgressIndicator())
+
+                : vm.errorMessage != null
+                    ? Center(child: Text(vm.errorMessage!))
+
+                    : filtered.isEmpty
+                        ? Center(
+                            child: Text(
+                              "No recipes match your filters.",
+                              style: Theme.of(context).textTheme.bodyLarge,
                             ),
+                          )
+
+                        : FadeInWidget(
+                            duration: const Duration(milliseconds: 400),
+                            child: _SwipeDeck(recipes: filtered),
                           ),
-                        )
-                      : filtered.isEmpty
-                          ? Center(
-                              child: Text(
-                                'No recipes match your filters.\nTry changing them!',
-                                textAlign: TextAlign.center,
-                                style: Theme.of(context).textTheme.bodyLarge,
-                              ),
-                            )
-                          : FadeInWidget(
-                              duration: const Duration(milliseconds: 600),
-                              child: _SwipeDeck(recipes: filtered),
-                            ),
-            ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
 }
 
-class _ScaleButtonOnTap extends StatefulWidget {
-  final VoidCallback onPressed;
-  final Widget child;
-  const _ScaleButtonOnTap({required this.onPressed, required this.child});
-
-  @override
-  State<_ScaleButtonOnTap> createState() => _ScaleButtonOnTapState();
-}
-
-class _ScaleButtonOnTapState extends State<_ScaleButtonOnTap>
-    with SingleTickerProviderStateMixin {
-  late AnimationController _controller;
-  late Animation<double> _scaleAnimation;
-
-  @override
-  void initState() {
-    super.initState();
-    _controller = AnimationController(
-      duration: const Duration(milliseconds: 150),
-      vsync: this,
-    );
-    _scaleAnimation = Tween<double>(begin: 1.0, end: 0.95).animate(
-      CurvedAnimation(parent: _controller, curve: Curves.easeInOut),
-    );
-  }
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
-  }
-
-  void _handleTapDown() async => await _controller.forward();
-  void _handleTapUp() async {
-    await _controller.reverse();
-    widget.onPressed();
-  }
-
-  void _handleTapCancel() => _controller.reverse();
-
-  @override
-  Widget build(BuildContext context) {
-    return Semantics(
-      button: true,
-      label: 'Retry loading recipes',
-      hint: 'Retries fetching recipes from the server',
-      child: GestureDetector(
-        onTapDown: (_) => _handleTapDown(),
-        onTapUp: (_) => _handleTapUp(),
-        onTapCancel: _handleTapCancel,
-        child: ScaleTransition(scale: _scaleAnimation, child: widget.child),
-      ),
-    );
-  }
-}
-
+// -------------------------------------------------------
+// SWIPE DECK COMPONENT
+// -------------------------------------------------------
 class _SwipeDeck extends StatefulWidget {
   final List<Recipe> recipes;
-
   const _SwipeDeck({required this.recipes});
 
   @override
@@ -225,26 +193,22 @@ class _SwipeDeckState extends State<_SwipeDeck> {
               up: true,
             ),
             cardBuilder: (context, index, _, __) {
+              _currentIndex = index;
               return RecipeCard(recipe: widget.recipes[index]);
             },
-            onSwipe: (previousIndex, currentIndex, direction) {
-              final recipe = widget.recipes[previousIndex];
+            onSwipe: (prev, next, dir) {
+              final recipe = widget.recipes[prev];
 
-              if (direction == CardSwiperDirection.right) {
-                vm.like(recipe);
-              } else if (direction == CardSwiperDirection.left) {
-                vm.reject(recipe);
-              } else if (direction == CardSwiperDirection.top) {
+              if (dir == CardSwiperDirection.right) vm.like(recipe);
+
+              if (dir == CardSwiperDirection.top) {
                 showRecipeDetailSheet(context, recipe);
                 _controller.undo();
               }
 
               setState(() {
-                if (direction == CardSwiperDirection.top) {
-                  _currentIndex = previousIndex;
-                } else {
-                  _currentIndex = currentIndex ?? widget.recipes.length;
-                }
+                _currentIndex =
+                    dir == CardSwiperDirection.top ? prev : (next ?? prev);
               });
 
               return true;
@@ -257,44 +221,30 @@ class _SwipeDeckState extends State<_SwipeDeck> {
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Semantics(
-              button: true,
-              label: 'Reject recipe',
-              child: IconButton(
-                iconSize: 40,
-                icon: Icon(Icons.close,
-                    color: Theme.of(context).colorScheme.error),
-                onPressed: () =>
-                    _controller.swipe(CardSwiperDirection.left),
-              ),
+            IconButton(
+              iconSize: 40,
+              icon: Icon(Icons.close,
+                  color: Theme.of(context).colorScheme.error),
+              onPressed: () =>
+                  _controller.swipe(CardSwiperDirection.left),
             ),
             const SizedBox(width: 24),
-            Semantics(
-              button: true,
-              label: 'Show details',
-              child: IconButton(
-                iconSize: 36,
-                icon: Icon(Icons.arrow_upward,
-                    color: Theme.of(context).colorScheme.primary),
-                onPressed: () {
-                  if (_currentIndex < widget.recipes.length) {
-                    showRecipeDetailSheet(
-                        context, widget.recipes[_currentIndex]);
-                  }
-                },
-              ),
+            IconButton(
+              iconSize: 36,
+              icon: Icon(Icons.arrow_upward,
+                  color: Theme.of(context).colorScheme.primary),
+              onPressed: () {
+                showRecipeDetailSheet(
+                    context, widget.recipes[_currentIndex]);
+              },
             ),
             const SizedBox(width: 24),
-            Semantics(
-              button: true,
-              label: 'Save recipe',
-              child: IconButton(
-                iconSize: 40,
-                icon: Icon(Icons.favorite,
-                    color: Theme.of(context).colorScheme.secondary),
-                onPressed: () =>
-                    _controller.swipe(CardSwiperDirection.right),
-              ),
+            IconButton(
+              iconSize: 40,
+              icon: Icon(Icons.favorite,
+                  color: Theme.of(context).colorScheme.secondary),
+              onPressed: () =>
+                  _controller.swipe(CardSwiperDirection.right),
             ),
           ],
         ),

@@ -9,7 +9,7 @@ import 'widgets/staggered_list_item.dart';
 import 'widgets/snackstack_header.dart'; 
 
 class SearchScreen extends StatelessWidget {
-  const SearchScreen({Key? key}) : super(key: key);
+  const SearchScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -32,7 +32,7 @@ class SearchScreen extends StatelessWidget {
               decoration: InputDecoration(
                 hintText: "Search recipes...",
                 filled: true,
-                fillColor: Theme.of(context).colorScheme.surfaceVariant,
+                fillColor: Theme.of(context).colorScheme.surfaceContainerHighest,
                 prefixIcon: const Icon(Icons.search),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),

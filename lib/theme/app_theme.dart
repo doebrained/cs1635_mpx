@@ -91,11 +91,9 @@ class AppTheme {
         0.1,
       ),
       onErrorContainer: AccessibleColors.error,
-      background: AccessibleColors.surface,
-      onBackground: AccessibleColors.textPrimary,
       surface: AccessibleColors.surface,
       onSurface: AccessibleColors.textPrimary,
-      surfaceVariant: AccessibleColors.surfaceLight,
+      surfaceContainerHighest: AccessibleColors.surfaceLight,
       onSurfaceVariant: AccessibleColors.textSecondary,
       outline: AccessibleColors.border,
       outlineVariant: AccessibleColors.divider,
@@ -328,14 +326,14 @@ class AppTheme {
 
       // Switch styling
       switchTheme: SwitchThemeData(
-        thumbColor: MaterialStateProperty.resolveWith((states) {
-          if (states.contains(MaterialState.selected)) {
+        thumbColor: WidgetStateProperty.resolveWith((states) {
+          if (states.contains(WidgetState.selected)) {
             return colorScheme.primary;
           }
           return AccessibleColors.textTertiary;
         }),
-        trackColor: MaterialStateProperty.resolveWith((states) {
-          if (states.contains(MaterialState.selected)) {
+        trackColor: WidgetStateProperty.resolveWith((states) {
+          if (states.contains(WidgetState.selected)) {
             return colorScheme.primary.withOpacity(0.5);
           }
           return AccessibleColors.divider;

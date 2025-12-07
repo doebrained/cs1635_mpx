@@ -4,8 +4,7 @@ import '../theme/app_theme.dart';
 
 class AppNavigationDrawer extends StatelessWidget {
   final String currentRoute;
-  const AppNavigationDrawer({Key? key, required this.currentRoute})
-    : super(key: key);
+  const AppNavigationDrawer({super.key, required this.currentRoute});
 
   void _navigate(BuildContext context, String route) {
     if (route == currentRoute) {
