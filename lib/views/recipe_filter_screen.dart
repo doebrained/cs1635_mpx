@@ -192,23 +192,35 @@ class _SwipeDeckState extends State<_SwipeDeck> {
               right: true,
               up: true,
             ),
+
             cardBuilder: (context, index, _, __) {
               _currentIndex = index;
               return RecipeCard(recipe: widget.recipes[index]);
             },
+
             onSwipe: (prev, next, dir) {
               final recipe = widget.recipes[prev];
 
-              if (dir == CardSwiperDirection.right) vm.like(recipe);
+              // RIGHT = LIKE
+              if (dir == CardSwiperDirection.right) {
+                vm.like(recipe);
+              }
 
+              // UP = SHOW DETAILS (and undo swipe)
               if (dir == CardSwiperDirection.top) {
                 showRecipeDetailSheet(context, recipe);
                 _controller.undo();
+                return false; // keep card in place
               }
 
+              // LEFT = SKIP (optional reject logic)
+              if (dir == CardSwiperDirection.left) {
+                vm.reject(recipe);
+              }
+
+              // Update index
               setState(() {
-                _currentIndex =
-                    dir == CardSwiperDirection.top ? prev : (next ?? prev);
+                _currentIndex = next ?? prev;
               });
 
               return true;
@@ -223,10 +235,9 @@ class _SwipeDeckState extends State<_SwipeDeck> {
           children: [
             IconButton(
               iconSize: 40,
-              icon: Icon(Icons.close,
-                  color: Theme.of(context).colorScheme.error),
-              onPressed: () =>
-                  _controller.swipe(CardSwiperDirection.left),
+              icon:
+                  Icon(Icons.close, color: Theme.of(context).colorScheme.error),
+              onPressed: () => _controller.swipe(CardSwiperDirection.left),
             ),
             const SizedBox(width: 24),
             IconButton(
