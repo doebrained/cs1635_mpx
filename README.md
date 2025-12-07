@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="assets/Logo.png" alt="SnackStack Logo" width="180"/>
+</p>
+
 # 🍽️ SnackStack — Intelligent Recipe Discovery  
 ### CS1635 / CS2035 — Machine Problem X  
 **Fall 2025 — Dr. Jacob Biehl**
@@ -13,20 +17,74 @@
 
 ---
 
-# 📌 **App Pitch**
+# 📌 App Pitch
 
 **SnackStack** is a Tinder-style recipe discovery app designed to make cooking fast, fun, and personalized.  
-Users swipe through beautifully presented recipe cards, save their favorite ones, and filter results based on dietary preferences including:
+Users swipe through beautifully designed recipe cards, save favorites, and filter results based on dietary needs.
 
+### Supported Filters:
 - **Celiac-safe (gluten-free)**
 - **Lactose-free**
 - **Vegetarian**
 - **Vegan**
 - **Kosher**
 
-Each recipe includes:
-
+### Each recipe includes:
 - Images  
 - Ingredient breakdown  
 - Instructions  
-- Smart allergen detection 
+- Smart allergen detection  
+
+## 🌐 TheMealDB API
+
+Used for:
+
+- Fetching recipe lists  
+- Ingredient details  
+- Nutrition data  
+- Allergen & dietary information  
+
+---
+
+# 📸 Screenshots
+
+### **Main App Screens**
+
+| Home / Swipe | Saved Recipes | Search Page |
+|--------------|---------------|-------------|
+| <img src="assets/MainPage.png" width="260"/> | <img src="assets/SavedRecipes.png" width="260"/> | <img src="assets/SearchRecipes.png" width="260"/> |
+
+---
+
+### 🎥 **Demo Video**
+GitHub cannot embed `.mov`, but you can **click to download/view**:
+
+👉 [Screen Recording](assets/Screen%20Recording.mov)
+
+---
+
+# 🧠 Architecture — MVVM Design
+
+┌────────────────────────┐
+│        Models          │
+│  • Recipe              │
+│  • Nutrition           │
+│  • Ingredient          │
+└───────────▲────────────┘
+            │
+            │
+┌───────────┴────────────┐
+│      ViewModels         │
+│  • RecipeFilterVM       │
+│  • SearchVM             │
+│  • SavedRecipesVM       │
+└───────────▲────────────┘
+            │
+            │
+┌───────────┴────────────┐
+│          Views          │
+│  • Swipe Deck           │
+│  • Search Screen        │
+│  • Recipe Detail Sheet  │
+│  • Saved Recipes Page   │
+└────────────────────────┘
