@@ -57,6 +57,8 @@ Used for:
 ---
 
 ### **Demo Video**
+https://youtu.be/e6uJiC48LzI?si=AWY_TZeldC5Y3Abk
+
 GitHub cannot embed `.mov`, but you can **click to download/view**:
 
  [Screen Recording For Swipe Feature](lib/assets/ScreenRecording.mov)
