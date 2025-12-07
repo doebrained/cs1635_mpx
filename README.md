@@ -59,7 +59,7 @@ Used for:
 ### 🎥 **Demo Video**
 GitHub cannot embed `.mov`, but you can **click to download/view**:
 
-👉 [Screen Recording](lib/assets/ScreenRecording.mov)
+👉 [Screen Recording For Swipe Feature](lib/assets/ScreenRecording.mov)
 
 ---
 
