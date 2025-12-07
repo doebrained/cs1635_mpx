@@ -67,7 +67,7 @@ GitHub cannot embed `.mov`, but you can **click to download/view**:
 
                  +------------------------+
                  |        Models          |
-                 |  • Recipe              |          |
+                 |  • Recipe              |          
                  +-----------▲------------+
                              │
                              │
