@@ -7,7 +7,7 @@ import 'widgets/recipe_detail_sheet.dart';
 import 'widgets/fade_in_widget.dart';
 import 'widgets/staggered_list_item.dart';
 import 'widgets/snackstack_header.dart'; 
-import 'widgets/snackstack_header.dart';
+import 'widgets/tag_chip.dart';
 
 class SearchScreen extends StatelessWidget {
   const SearchScreen({super.key});
