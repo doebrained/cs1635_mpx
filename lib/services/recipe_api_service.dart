@@ -13,7 +13,7 @@ class RecipeApiService {
   RecipeApiService({http.Client? client}) : _client = client ?? http.Client();
 
   // Public method your ViewModel already calls
-  Future<List<Recipe>> fetchRecipes({String query = 'chicken'}) async {
+  Future<List<Recipe>> fetchRecipes({String query = ''}) async {
     return searchRecipesByName(query);
   }
 
@@ -59,3 +59,4 @@ Future<List<Recipe>> _parseRecipesIsolate(String responseBody) async {
       .map((mealJson) => Recipe.fromJson(mealJson as Map<String, dynamic>))
       .toList();
 }
+
