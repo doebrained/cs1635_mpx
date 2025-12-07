@@ -156,43 +156,6 @@ class Recipe {
   }
 
   // ----------------------------
-  // NUT FREE
-  // ----------------------------
-  bool get isNutFree {
-    const nuts = [
-      "almond",
-      "peanut",
-      "walnut",
-      "cashew",
-      "hazelnut",
-      "pecan",
-      "pistachio",
-      "nut"
-    ];
-
-    return !nuts.any(_fullText.contains);
-  }
-
-  // ----------------------------
-  // HALAL
-  // ----------------------------
-  bool get isHalal {
-    const haramItems = [
-      "pork",
-      "bacon",
-      "ham",
-      "lard",
-      "gelatin (non-halal)",
-      "beer",
-      "wine",
-      "alcohol"
-    ];
-
-    // If any haram item exists → false
-    return !haramItems.any(_fullText.contains);
-  }
-
-  // ----------------------------
   // KOSHER
   // ----------------------------
   bool get isKosher {
