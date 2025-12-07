@@ -7,6 +7,7 @@ import 'widgets/recipe_detail_sheet.dart';
 import 'widgets/fade_in_widget.dart';
 import 'widgets/staggered_list_item.dart';
 import 'widgets/snackstack_header.dart'; 
+import 'widgets/snackstack_header.dart';
 
 class SearchScreen extends StatelessWidget {
   const SearchScreen({super.key});
@@ -65,32 +66,53 @@ class SearchScreen extends StatelessWidget {
                             itemCount: searchVm.searchResults.length,
                             itemBuilder: (context, index) {
                               final recipe = searchVm.searchResults[index];
+                            
+                              // Build a list of human-readable tags for semantics
+                              final List<String> tags = [];
+                              if (recipe.isCeliacSafe) tags.add('Gluten-free');
+                              if (recipe.isLactoseFree) tags.add('Dairy-free');
+                              if (recipe.isVegetarian) tags.add('Vegetarian');
+                              if (recipe.isVegan) tags.add('Vegan');
+                              if (recipe.isKosher) tags.add('Kosher');
+                            
                               return StaggeredListItem(
                                 index: index,
                                 delay: Duration(milliseconds: 50 * index),
                                 child: Semantics(
                                   button: true,
                                   label: recipe.title,
-                                  hint: recipe.isCeliacSafe
-                                      ? 'Gluten-free recipe. Double tap to view details.'
-                                      : 'Contains gluten. Double tap to view details.',
+                                  hint: tags.isNotEmpty
+                                      ? '${tags.join(", ")}. Double tap to view details.'
+                                      : 'Double tap to view details.',
                                   child: ListTile(
                                     title: Text(recipe.title),
-                                    subtitle: Text(
-                                      recipe.isCeliacSafe
-                                          ? "Gluten-free"
-                                          : "Contains gluten",
+                                    subtitle: Wrap(
+                                      spacing: 6,
+                                      runSpacing: 4,
+                                      children: [
+                                        if (recipe.isCeliacSafe)
+                                          TagChip(label: 'Gluten-free'),
+                                        if (recipe.isLactoseFree)
+                                          TagChip(label: 'Dairy-free'),
+                                        if (recipe.isVegetarian)
+                                          TagChip(label: 'Vegetarian'),
+                                        if (recipe.isVegan)
+                                          TagChip(label: 'Vegan'),
+                                        if (recipe.isKosher)
+                                          TagChip(label: 'Kosher'),
+                                      ],
                                     ),
                                     trailing: const Icon(
                                       Icons.arrow_forward_ios,
                                       size: 16,
                                     ),
-                                    onTap: () =>
-                                        showRecipeDetailSheet(context, recipe),
+                                    onTap: () => showRecipeDetailSheet(context, recipe),
                                   ),
                                 ),
                               );
                             },
+                            
+                                                          
                           ),
                         ),
             ),
