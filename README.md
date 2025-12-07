@@ -2,13 +2,13 @@
   <img src="lib/assets/Logo.png" alt="SnackStack Logo" width="180"/>
 </p>
 
-# 🍽️ SnackStack — Intelligent Recipe Discovery  
+# SnackStack — Intelligent Recipe Discovery  
 ### CS1635 / CS2035 — Machine Problem X  
 **Fall 2025 — Dr. Jacob Biehl**
 
 ---
 
-## 👥 **Collaborators**
+## **Collaborators**
 | Name | Email |
 |------|-------|
 | **Jay Patel** | *(jgp33@pitt.edu)* |
@@ -17,7 +17,7 @@
 
 ---
 
-# 📌 App Pitch
+# App Pitch
 
 **SnackStack** is a Tinder-style recipe discovery app designed to make cooking fast, fun, and personalized.  
 Users swipe through beautifully designed recipe cards, save favorites, and filter results based on dietary needs.
@@ -35,7 +35,7 @@ Users swipe through beautifully designed recipe cards, save favorites, and filte
 - Instructions  
 - Smart allergen detection  
 
-## 🌐 TheMealDB API
+## TheMealDB API
 
 Used for:
 
@@ -46,7 +46,7 @@ Used for:
 
 ---
 
-# 📸 Screenshots
+# Screenshots
 
 ### **Main App Screens**
 
@@ -56,14 +56,14 @@ Used for:
 
 ---
 
-### 🎥 **Demo Video**
+### **Demo Video**
 GitHub cannot embed `.mov`, but you can **click to download/view**:
 
-👉 [Screen Recording For Swipe Feature](lib/assets/ScreenRecording.mov)
+ [Screen Recording For Swipe Feature](lib/assets/ScreenRecording.mov)
 
 ---
 
-# 🧠 Architecture — MVVM Design
+# Architecture — MVVM Design
 
                  +------------------------+
                  |        Models          |
