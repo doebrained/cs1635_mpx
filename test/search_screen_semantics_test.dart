@@ -44,17 +44,6 @@ void main() {
       ingredients: const ['chicken'],
     );
 
-    final wheatRecipe = Recipe(
-      id: 's2',
-      title: 'Wheat Bread',
-      imageUrl: '',
-      instructions: 'Contains wheat flour',
-      sourceUrl: '',
-      area: '',
-      category: '',
-      ingredients: const ['wheat flour'],
-    );
-
     final fakeVm = FakeSearchViewModel();
 
     await tester.pumpWidget(
